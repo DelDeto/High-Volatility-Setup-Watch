@@ -1,4 +1,14 @@
+.env
+.env.*
+!.env.example
+
 __pycache__/
 *.py[cod]
-output/
-.DS_Store
+.pytest_cache/
+
+user_data/data/
+user_data/logs/
+user_data/backtest_results/
+user_data/hyperopt_results/
+user_data/tradesv3.sqlite*
+user_data/*.sqlite*
