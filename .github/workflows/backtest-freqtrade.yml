@@ -23,14 +23,19 @@ jobs:
 
       - name: Download 15m / 1h / 4h futures data
         run: |
+          set -euo pipefail
           docker compose run --rm freqtrade download-data \
             --config /freqtrade/user_data/config-backtest.json \
             --timeframes 15m 1h 4h \
-            --days "${{ inputs.days }}"
+            --days "${{ inputs.days }}" 2>&1 | tee /tmp/download.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/download.log; then
+            exit 1
+          fi
 
       - name: Backtest strategy
         shell: bash
         run: |
+          set -euo pipefail
           EXTRA_ARGS=()
           if [ -n "${{ inputs.timerange }}" ]; then
             EXTRA_ARGS+=(--timerange "${{ inputs.timerange }}")
@@ -38,11 +43,15 @@ jobs:
           docker compose run --rm freqtrade backtesting \
             --config /freqtrade/user_data/config-backtest.json \
             --strategy MarketOpportunityStrategy \
-            "${EXTRA_ARGS[@]}"
+            "${EXTRA_ARGS[@]}" 2>&1 | tee /tmp/backtest.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/backtest.log; then
+            exit 1
+          fi
 
       - name: Lookahead analysis
         shell: bash
         run: |
+          set -euo pipefail
           EXTRA_ARGS=()
           if [ -n "${{ inputs.timerange }}" ]; then
             EXTRA_ARGS+=(--timerange "${{ inputs.timerange }}")
@@ -50,7 +59,10 @@ jobs:
           docker compose run --rm freqtrade lookahead-analysis \
             --config /freqtrade/user_data/config-backtest.json \
             --strategy MarketOpportunityStrategy \
-            "${EXTRA_ARGS[@]}"
+            "${EXTRA_ARGS[@]}" 2>&1 | tee /tmp/lookahead.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/lookahead.log; then
+            exit 1
+          fi
 
       - name: Upload backtest results
         if: always()
