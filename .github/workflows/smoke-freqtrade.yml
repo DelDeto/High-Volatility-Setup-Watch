@@ -17,27 +17,43 @@ jobs:
 
       - name: Check live Binance futures pairlist
         run: |
+          set -euo pipefail
           docker compose run --rm freqtrade test-pairlist \
-            --config /freqtrade/user_data/config.json
+            --config /freqtrade/user_data/config.json 2>&1 | tee /tmp/pairlist.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/pairlist.log; then
+            exit 1
+          fi
 
       - name: Download smoke-test data
         run: |
+          set -euo pipefail
           docker compose run --rm freqtrade download-data \
             --config /freqtrade/user_data/config-backtest.json \
             --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT \
             --timeframes 15m 1h 4h \
-            --days 45
+            --days 45 2>&1 | tee /tmp/download.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/download.log; then
+            exit 1
+          fi
 
       - name: Smoke backtest
         run: |
+          set -euo pipefail
           docker compose run --rm freqtrade backtesting \
             --config /freqtrade/user_data/config-backtest.json \
             --strategy MarketOpportunityStrategy \
-            --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT
+            --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT 2>&1 | tee /tmp/backtest.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/backtest.log; then
+            exit 1
+          fi
 
       - name: Lookahead analysis
         run: |
+          set -euo pipefail
           docker compose run --rm freqtrade lookahead-analysis \
             --config /freqtrade/user_data/config-backtest.json \
             --strategy MarketOpportunityStrategy \
-            --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT
+            --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT 2>&1 | tee /tmp/lookahead.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/lookahead.log; then
+            exit 1
+          fi
