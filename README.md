@@ -40,9 +40,9 @@ All active USDT perpetual markets
         ↓
 Remove stocks / indices / commodities / forex / metals
         ↓
-Age / spread filters
-        ↓
 VolumePairList → top 150 liquid crypto pairs
+        ↓
+Age / spread filters
         ↓
 15M base strategy
    + 1H context

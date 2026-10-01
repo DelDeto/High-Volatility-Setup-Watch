@@ -80,18 +80,18 @@
       "info_compare_value": "metals"
     },
     {
+      "method": "VolumePairList",
+      "number_assets": 150,
+      "sort_key": "quoteVolume",
+      "refresh_period": 1800
+    },
+    {
       "method": "AgeFilter",
       "min_days_listed": 14
     },
     {
       "method": "SpreadFilter",
       "max_spread_ratio": 0.003
-    },
-    {
-      "method": "VolumePairList",
-      "number_assets": 150,
-      "sort_key": "quoteVolume",
-      "refresh_period": 1800
     }
   ],
   "telegram": {
