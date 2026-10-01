@@ -1,0 +1,39 @@
+name: Exchange Connectivity Probe V2
+
+on:
+  push:
+    branches:
+      - freqtrade-migration
+
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        exchange:
+          - gate
+          - bitget
+          - bybit
+          - okx
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Freqtrade stable
+        run: docker compose pull
+
+      - name: Probe futures market
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout 90s docker compose run --rm freqtrade list-pairs \
+            --exchange "${{ matrix.exchange }}" \
+            --quote USDT \
+            --trading-mode futures 2>&1 | tee "/tmp/${{ matrix.exchange }}.log"
+          RC=${PIPESTATUS[0]}
+          if [ "$RC" -ne 0 ] || grep -Eq "CRITICAL|ERROR -" "/tmp/${{ matrix.exchange }}.log"; then
+            echo "RESULT:${{ matrix.exchange }}:ERROR"
+            exit 1
+          fi
+          echo "RESULT:${{ matrix.exchange }}:OK"
