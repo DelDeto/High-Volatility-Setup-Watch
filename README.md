@@ -42,7 +42,7 @@ Remove stocks / indices / commodities / forex / metals
         ↓
 VolumePairList → top 150 liquid crypto pairs
         ↓
-Age / spread filters
+Spread filter
         ↓
 15M base strategy
    + 1H context
