@@ -1,0 +1,61 @@
+name: Freqtrade Backtest
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Days of Binance futures history to download"
+        required: true
+        default: "180"
+      timerange:
+        description: "Optional Freqtrade timerange, e.g. 20260101-20260930"
+        required: false
+        default: ""
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Freqtrade stable
+        run: docker compose pull
+
+      - name: Download 15m / 1h / 4h futures data
+        run: |
+          docker compose run --rm freqtrade download-data \
+            --config /freqtrade/user_data/config-backtest.json \
+            --timeframes 15m 1h 4h \
+            --days "${{ inputs.days }}"
+
+      - name: Backtest strategy
+        shell: bash
+        run: |
+          EXTRA_ARGS=()
+          if [ -n "${{ inputs.timerange }}" ]; then
+            EXTRA_ARGS+=(--timerange "${{ inputs.timerange }}")
+          fi
+          docker compose run --rm freqtrade backtesting \
+            --config /freqtrade/user_data/config-backtest.json \
+            --strategy MarketOpportunityStrategy \
+            "${EXTRA_ARGS[@]}"
+
+      - name: Lookahead analysis
+        shell: bash
+        run: |
+          EXTRA_ARGS=()
+          if [ -n "${{ inputs.timerange }}" ]; then
+            EXTRA_ARGS+=(--timerange "${{ inputs.timerange }}")
+          fi
+          docker compose run --rm freqtrade lookahead-analysis \
+            --config /freqtrade/user_data/config-backtest.json \
+            --strategy MarketOpportunityStrategy \
+            "${EXTRA_ARGS[@]}"
+
+      - name: Upload backtest results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freqtrade-backtest-results
+          path: user_data/backtest_results/
+          if-no-files-found: ignore
