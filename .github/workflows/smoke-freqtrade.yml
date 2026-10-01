@@ -32,5 +32,11 @@ jobs:
       - name: Lookahead analysis
         run: |
           set -euo pipefail
-          docker compose run --rm freqtrade lookahead-analysis --config /freqtrade/user_data/config-backtest.json --strategy MarketOpportunityStrategy --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT VVV/USDT:USDT USELESS/USDT:USDT 2>&1 | tee /tmp/lookahead.log
+          START_DATE="$(date -u -d '45 days ago' +%Y%m%d)"
+          END_DATE="$(date -u +%Y%m%d)"
+          docker compose run --rm freqtrade lookahead-analysis \
+            --config /freqtrade/user_data/config-backtest.json \
+            --strategy MarketOpportunityStrategy \
+            --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT VVV/USDT:USDT USELESS/USDT:USDT \
+            --timerange "${START_DATE}-${END_DATE}" 2>&1 | tee /tmp/lookahead.log
           if grep -Eq "CRITICAL|ERROR -" /tmp/lookahead.log; then exit 1; fi
