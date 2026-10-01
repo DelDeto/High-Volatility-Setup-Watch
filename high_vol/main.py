@@ -190,7 +190,7 @@ def main():
         f"full_scan={len(scan_symbols)}"
     )
 
-    frames_by_symbol, fetch_errors = fetch_many_frames(
+    frames_by_symbol, fetch_errors, insufficient_history = fetch_many_frames(
         scan_symbols,
         workers=6,
     )
@@ -270,7 +270,10 @@ def main():
         "correlation_suppressed_count": suppressed,
         "setups": results,
         "prefilter_rejections": rejections,
+        "fetch_error_count": len(fetch_errors),
+        "insufficient_history_count": len(insufficient_history),
         "fetch_errors": fetch_errors,
+        "insufficient_history": insufficient_history,
         "analysis_errors": analysis_errors,
         "outcome_count": len(outcomes),
     }
@@ -336,6 +339,8 @@ def main():
         f"PULLBACK={counts['PULLBACK_READY']} "
         f"DEVELOPING={counts['HIGH_VOL_DEVELOPING']} "
         f"OVEREXTENDED={counts['OVEREXTENDED']} "
+        f"INSUFFICIENT_HISTORY={len(insufficient_history)} "
+        f"FETCH_ERRORS={len(fetch_errors)} "
         f"SUPPRESSED={suppressed}"
     )
 
