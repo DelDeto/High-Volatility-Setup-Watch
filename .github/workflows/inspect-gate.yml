@@ -15,7 +15,7 @@ jobs:
         run: docker compose pull
       - name: Print Gate contract classifications
         run: |
-          docker compose run --rm --entrypoint python freqtrade - <<'PY'
+          docker compose run -T --rm --entrypoint python freqtrade - <<'PY'
           import ccxt
           e = ccxt.gate({"options": {"defaultType": "swap"}})
           markets = e.load_markets()
