@@ -38,23 +38,46 @@
     "secret": "",
     "ccxt_config": {},
     "ccxt_async_config": {},
-    "pair_whitelist": [],
+    "pair_whitelist": [
+      ".*/USDT:USDT"
+    ],
     "pair_blacklist": [
       ".*(UP|DOWN|BULL|BEAR)/.*"
     ]
   },
   "pairlists": [
     {
-      "method": "VolumePairList",
-      "number_assets": 300,
-      "sort_key": "quoteVolume",
-      "refresh_period": 1800
+      "method": "StaticPairList"
     },
     {
       "method": "PairInformationFilter",
-      "selection_mode": "whitelist",
+      "selection_mode": "blacklist",
       "info_key": "info.contract_type",
-      "info_compare_value": ""
+      "info_compare_value": "stocks"
+    },
+    {
+      "method": "PairInformationFilter",
+      "selection_mode": "blacklist",
+      "info_key": "info.contract_type",
+      "info_compare_value": "indices"
+    },
+    {
+      "method": "PairInformationFilter",
+      "selection_mode": "blacklist",
+      "info_key": "info.contract_type",
+      "info_compare_value": "commodities"
+    },
+    {
+      "method": "PairInformationFilter",
+      "selection_mode": "blacklist",
+      "info_key": "info.contract_type",
+      "info_compare_value": "forex"
+    },
+    {
+      "method": "PairInformationFilter",
+      "selection_mode": "blacklist",
+      "info_key": "info.contract_type",
+      "info_compare_value": "metals"
     },
     {
       "method": "AgeFilter",
@@ -65,9 +88,10 @@
       "max_spread_ratio": 0.003
     },
     {
-      "method": "OffsetFilter",
-      "offset": 0,
-      "number_assets": 150
+      "method": "VolumePairList",
+      "number_assets": 150,
+      "sort_key": "quoteVolume",
+      "refresh_period": 1800
     }
   ],
   "telegram": {

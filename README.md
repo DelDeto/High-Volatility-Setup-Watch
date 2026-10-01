@@ -20,7 +20,7 @@ High volatility is now a **regime**, not the first filter. This avoids excluding
 
 The original migration targeted Binance Futures, but GitHub-hosted runners received HTTP 451 from Binance because of geo-IP restrictions. Gate futures was then tested from the same GitHub Actions environment and returned the USDT perpetual market successfully.
 
-The live pairlist applies a Gate-specific crypto-only filter using `info.contract_type == ""`. Gate classifies non-crypto perpetuals (stocks, metals, indices, forex, commodities, etc.) through `contract_type`, while crypto contracts such as BTC use an empty value.
+The live pairlist starts from all active Gate USDT perpetuals, then removes the five non-crypto `contract_type` classes observed from Gate metadata: `stocks`, `indices`, `commodities`, `forex`, and `metals`. The connectivity inspection found 584 crypto perpetual markets with an empty classification, so the volume ranking is applied only after the TradFi contracts are removed.
 
 ## Safety model
 
@@ -36,13 +36,13 @@ The old MEXC implementation is preserved in branch `legacy-high-vol-v1`.
 ```text
 Gate USDT perpetual futures
         ↓
-VolumePairList (top 300 raw markets)
+All active USDT perpetual markets
         ↓
-Crypto-only contract_type filter
+Remove stocks / indices / commodities / forex / metals
         ↓
 Age / spread filters
         ↓
-Cap to top 150 liquid crypto pairs
+VolumePairList → top 150 liquid crypto pairs
         ↓
 15M base strategy
    + 1H context
