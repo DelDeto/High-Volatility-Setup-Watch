@@ -44,6 +44,11 @@ def build_text(report):
             f"OVEREXTENDED {counts.get('OVEREXTENDED', 0)} | "
             f"Corr suppressed {report.get('correlation_suppressed_count', 0)}"
         ),
+        (
+            f"Insufficient history: "
+            f"{report.get('insufficient_history_count', 0)} | "
+            f"Fetch errors: {report.get('fetch_error_count', 0)}"
+        ),
     ]
 
     if not rows:
