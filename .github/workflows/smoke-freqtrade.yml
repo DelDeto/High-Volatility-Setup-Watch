@@ -1,0 +1,43 @@
+name: Freqtrade Binance Smoke Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - freqtrade-migration
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Freqtrade stable
+        run: docker compose pull
+
+      - name: Check live Binance futures pairlist
+        run: |
+          docker compose run --rm freqtrade test-pairlist \
+            --config /freqtrade/user_data/config.json
+
+      - name: Download smoke-test data
+        run: |
+          docker compose run --rm freqtrade download-data \
+            --config /freqtrade/user_data/config-backtest.json \
+            --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT \
+            --timeframes 15m 1h 4h \
+            --days 45
+
+      - name: Smoke backtest
+        run: |
+          docker compose run --rm freqtrade backtesting \
+            --config /freqtrade/user_data/config-backtest.json \
+            --strategy MarketOpportunityStrategy \
+            --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT
+
+      - name: Lookahead analysis
+        run: |
+          docker compose run --rm freqtrade lookahead-analysis \
+            --config /freqtrade/user_data/config-backtest.json \
+            --strategy MarketOpportunityStrategy \
+            --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT
