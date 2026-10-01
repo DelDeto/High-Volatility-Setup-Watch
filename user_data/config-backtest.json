@@ -47,8 +47,5 @@
   ],
   "telegram": {
     "enabled": false
-  },
-  "api_server": {
-    "enabled": false
   }
 }
