@@ -10,6 +10,7 @@ from .config import (
     MOMENTUM_READY_MIN_SCORE,
     NORMAL_READY_DISTANCE_ATR,
     OVEREXTENDED_DISTANCE_ATR,
+    OVEREXTENDED_MIN_SCORE,
     PULLBACK_READY_MIN_SCORE,
     VERY_HIGH_READY_DISTANCE_ATR,
 )
@@ -233,6 +234,16 @@ def score_high_vol_setup(
     overextended = (
         distance_atr is not None
         and distance_atr >= OVEREXTENDED_DISTANCE_ATR
+        and rr_developing
+        and alignment_label != "CONFLICT"
+        and score >= OVEREXTENDED_MIN_SCORE
+        and plan.get("active")
+        and (
+            bool(setup.get("structure"))
+            or bool(setup.get("displacement"))
+            or bool(setup.get("retest"))
+            or bool(setup.get("sweep"))
+        )
     )
 
     momentum_ready = (
