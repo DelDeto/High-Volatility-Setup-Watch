@@ -32,6 +32,18 @@ _LAST_REQUEST_AT = 0.0
 _MIN_REQUEST_INTERVAL = 0.25
 
 
+class InsufficientHistoryError(RuntimeError):
+    def __init__(self, symbol, interval, available, required):
+        self.symbol = symbol
+        self.interval = interval
+        self.available = int(available)
+        self.required = int(required)
+        super().__init__(
+            f"{symbol} {interval}: only {available} closed candles; "
+            f"need {required}"
+        )
+
+
 def _throttle():
     global _LAST_REQUEST_AT
     with _REQUEST_LOCK:
@@ -249,9 +261,11 @@ def get_closed_klines(symbol, interval, limit=HISTORY_LIMIT):
     frame = frame.loc[(frame.index + delta) <= now].tail(limit)
 
     if len(frame) < MIN_HISTORY_REQUIRED:
-        raise RuntimeError(
-            f"{symbol} {interval}: only {len(frame)} closed candles; "
-            f"need {MIN_HISTORY_REQUIRED}"
+        raise InsufficientHistoryError(
+            symbol,
+            interval,
+            len(frame),
+            MIN_HISTORY_REQUIRED,
         )
 
     return frame
@@ -268,6 +282,7 @@ def fetch_symbol_frames(symbol):
 def fetch_many_frames(symbols, workers=6):
     output = {}
     errors = {}
+    insufficient_history = {}
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
@@ -278,7 +293,14 @@ def fetch_many_frames(symbols, workers=6):
             symbol = futures[future]
             try:
                 output[symbol] = future.result()
+            except InsufficientHistoryError as exc:
+                insufficient_history[symbol] = {
+                    "status": "INSUFFICIENT_HISTORY",
+                    "interval": exc.interval,
+                    "available": exc.available,
+                    "required": exc.required,
+                }
             except Exception as exc:
                 errors[symbol] = str(exc)
 
-    return output, errors
+    return output, errors, insufficient_history
