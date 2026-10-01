@@ -1,0 +1,30 @@
+name: Validate Freqtrade Migration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - freqtrade-migration
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON configs
+        run: |
+          python -m json.tool user_data/config.json >/dev/null
+          python -m json.tool user_data/config-backtest.json >/dev/null
+
+      - name: Validate Docker Compose
+        run: docker compose config
+
+      - name: Pull Freqtrade stable
+        run: docker compose pull
+
+      - name: Load strategy
+        run: |
+          docker compose run --rm freqtrade list-strategies \
+            --strategy-path /freqtrade/user_data/strategies
