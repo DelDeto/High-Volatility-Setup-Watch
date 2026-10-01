@@ -14,13 +14,17 @@ jobs:
 
       - name: Generate current Binance futures pairlist
         run: |
+          set -euo pipefail
           mkdir -p artifacts
           docker compose run --rm freqtrade test-pairlist \
             --config /freqtrade/user_data/config.json \
-            --print-json | tee artifacts/pairlist.json
+            --print-json 2>&1 | tee artifacts/pairlist.log
+          if grep -Eq "CRITICAL|ERROR -" artifacts/pairlist.log; then
+            exit 1
+          fi
 
       - name: Upload pairlist snapshot
         uses: actions/upload-artifact@v4
         with:
           name: binance-futures-pairlist
-          path: artifacts/pairlist.json
+          path: artifacts/pairlist.log
