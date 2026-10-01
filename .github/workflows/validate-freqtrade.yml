@@ -26,5 +26,18 @@ jobs:
 
       - name: Load strategy
         run: |
+          set -euo pipefail
           docker compose run --rm freqtrade list-strategies \
-            --strategy-path /freqtrade/user_data/strategies
+            --strategy-path /freqtrade/user_data/strategies 2>&1 | tee /tmp/strategy.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/strategy.log; then
+            exit 1
+          fi
+
+      - name: Validate live config
+        run: |
+          set -euo pipefail
+          docker compose run --rm freqtrade test-pairlist \
+            --config /freqtrade/user_data/config.json 2>&1 | tee /tmp/config.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/config.log; then
+            exit 1
+          fi
