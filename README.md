@@ -39,7 +39,10 @@ Execution is ready near a valid pullback/sweep/retest area with TP1 RR >= 2R and
 Promising high-volatility structure with TP1 RR >= 1.5R and score >= 68, but not yet ready.
 
 ### OVEREXTENDED
-The setup may be structurally attractive, but live price is >= 0.75 ATR away from the intended entry. It is tracked but not sent as an actionable Telegram setup.
+The setup must still be structurally valid: score >= 60, TP1 RR >= 1.5R, MTF not conflicting, an active trade plan, and at least one meaningful PA/SMC confirmation. Only then, if live price is >= 0.75 ATR away from the intended entry, it is classified as OVEREXTENDED. Low-quality distant setups are ignored.
+
+### INSUFFICIENT_HISTORY
+Newly listed contracts with fewer than the required 360 closed candles on a required timeframe are reported separately from API/fetch errors. They are not treated as scanner failures.
 
 ## Volatility regimes
 
