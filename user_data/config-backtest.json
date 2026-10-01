@@ -11,7 +11,7 @@
   "tradable_balance_ratio": 0.99,
   "fiat_display_currency": "USD",
   "exchange": {
-    "name": "binance",
+    "name": "gate",
     "key": "",
     "secret": "",
     "ccxt_config": {},
@@ -19,7 +19,6 @@
     "pair_whitelist": [
       "BTC/USDT:USDT",
       "ETH/USDT:USDT",
-      "BNB/USDT:USDT",
       "SOL/USDT:USDT",
       "XRP/USDT:USDT",
       "DOGE/USDT:USDT",
@@ -35,8 +34,9 @@
       "AAVE/USDT:USDT",
       "LTC/USDT:USDT",
       "BCH/USDT:USDT",
-      "ETC/USDT:USDT",
-      "TRX/USDT:USDT"
+      "VVV/USDT:USDT",
+      "USELESS/USDT:USDT",
+      "WIF/USDT:USDT"
     ],
     "pair_blacklist": []
   },

@@ -15,7 +15,7 @@ from freqtrade.strategy import IStrategy, informative
 
 class MarketOpportunityStrategy(IStrategy):
     """
-    Broad-market Binance USDT-M opportunity scanner.
+    Broad-market Gate USDT perpetual crypto opportunity scanner.
 
     Design goals:
     - High volatility is a regime, not a prerequisite.

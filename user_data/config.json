@@ -33,7 +33,7 @@
     "order_book_top": 1
   },
   "exchange": {
-    "name": "binance",
+    "name": "gate",
     "key": "",
     "secret": "",
     "ccxt_config": {},
@@ -46,9 +46,15 @@
   "pairlists": [
     {
       "method": "VolumePairList",
-      "number_assets": 150,
+      "number_assets": 300,
       "sort_key": "quoteVolume",
       "refresh_period": 1800
+    },
+    {
+      "method": "PairInformationFilter",
+      "selection_mode": "whitelist",
+      "info_key": "info.contract_type",
+      "info_compare_value": ""
     },
     {
       "method": "AgeFilter",
@@ -57,6 +63,11 @@
     {
       "method": "SpreadFilter",
       "max_spread_ratio": 0.003
+    },
+    {
+      "method": "OffsetFilter",
+      "offset": 0,
+      "number_assets": 150
     }
   ],
   "telegram": {

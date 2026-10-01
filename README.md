@@ -4,7 +4,7 @@ This branch rebuilds the former High Volatility Setup Watch on top of the offici
 
 ## Objective
 
-Scan a broad Binance USDT-M futures universe and keep only setups with:
+Scan a broad **Gate USDT perpetual crypto** universe and keep only setups with:
 
 - strong multi-timeframe structure (4H / 1H / 15M)
 - entry close to a meaningful structural zone
@@ -15,6 +15,12 @@ Scan a broad Binance USDT-M futures universe and keep only setups with:
 - long and short support
 
 High volatility is now a **regime**, not the first filter. This avoids excluding good normal-volatility pullbacks and avoids chasing extreme moves.
+
+## Why Gate
+
+The original migration targeted Binance Futures, but GitHub-hosted runners received HTTP 451 from Binance because of geo-IP restrictions. Gate futures was then tested from the same GitHub Actions environment and returned the USDT perpetual market successfully.
+
+The live pairlist applies a Gate-specific crypto-only filter using `info.contract_type == ""`. Gate classifies non-crypto perpetuals (stocks, metals, indices, forex, commodities, etc.) through `contract_type`, while crypto contracts such as BTC use an empty value.
 
 ## Safety model
 
@@ -28,11 +34,15 @@ The old MEXC implementation is preserved in branch `legacy-high-vol-v1`.
 ## Architecture
 
 ```text
-Binance USDT-M futures
+Gate USDT perpetual futures
         ↓
-VolumePairList (top 150)
+VolumePairList (top 300 raw markets)
+        ↓
+Crypto-only contract_type filter
         ↓
 Age / spread filters
+        ↓
+Cap to top 150 liquid crypto pairs
         ↓
 15M base strategy
    + 1H context
@@ -94,7 +104,7 @@ docker compose pull
 docker compose run --rm freqtrade list-strategies \
   --strategy-path /freqtrade/user_data/strategies
 
-# Inspect the current dynamic Binance futures universe
+# Inspect the current dynamic Gate crypto futures universe
 docker compose run --rm freqtrade test-pairlist \
   --config /freqtrade/user_data/config.json
 
@@ -119,9 +129,7 @@ Keep `.env` out of Git.
 
 ## Backtesting
 
-For reproducibility, `config-backtest.json` uses a static seed pairlist instead of the live VolumePairList. Freqtrade notes that dynamic pairlists in backtests reflect current market conditions and can make results non-reproducible.
-
-Run locally:
+For reproducibility, `config-backtest.json` uses a static seed pairlist instead of the live VolumePairList.
 
 ```bash
 docker compose run --rm freqtrade download-data \
@@ -133,19 +141,19 @@ docker compose run --rm freqtrade backtesting \
   --strategy MarketOpportunityStrategy
 ```
 
-A manual GitHub Actions backtest workflow is also included.
+A manual GitHub Actions backtest workflow is included.
 
-## What this version does not do yet
+## Validation path
 
-This migration intentionally does **not** auto-enable real-money execution. The next validation milestones are:
-
-1. validate the strategy container loads cleanly;
-2. backtest on a reproducible static pairlist;
-3. run lookahead analysis;
-4. run dry-run continuously;
-5. collect 50–100 closed setups;
-6. calibrate score and RR thresholds from actual outcomes;
-7. only then consider live execution.
+1. strategy/config validation;
+2. live Gate crypto pairlist smoke test;
+3. historical data download;
+4. backtest;
+5. lookahead analysis;
+6. continuous dry-run;
+7. collect 50–100 closed setups;
+8. calibrate score and RR thresholds;
+9. only then consider live execution.
 
 ## Upstream
 
