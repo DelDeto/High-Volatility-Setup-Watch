@@ -1,4 +1,4 @@
-name: V3.1 Market Opportunity Scan
+name: V3.2 Market Opportunity Scan
 
 on:
   schedule:
@@ -24,7 +24,7 @@ on:
         default: "10"
   push:
     branches:
-      - v3.1-outcome-tracker
+      - v3.2-visual-signal-pack
       - main
     paths:
       - "user_data/v3/**"
@@ -60,10 +60,19 @@ jobs:
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/outcome_tracker.py --self-test
 
+      - name: V3.2 chart self-test
+        run: |
+          mkdir -p user_data/v3_output/chart-self-test
+          chmod -R 0777 user_data/v3_output
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/chart_generator.py \
+            --self-test \
+            --output-dir /freqtrade/user_data/v3_output/chart-self-test
+
       - name: Prepare runtime directories
         run: |
-          mkdir -p user_data/v3_output user_data/v3_state
-          chmod 0777 user_data/v3_output user_data/v3_state
+          mkdir -p user_data/v3_output user_data/v3_state user_data/v3_charts
+          chmod 0777 user_data/v3_output user_data/v3_state user_data/v3_charts
 
       - name: Scan Gate market and rank Top-N
         shell: bash
@@ -95,7 +104,8 @@ jobs:
             /freqtrade/user_data/v3/outcome_tracker.py \
             --snapshot /freqtrade/user_data/v3_output/latest.json \
             --state /freqtrade/user_data/v3_output/ci-outcomes.json \
-            --summary /freqtrade/user_data/v3_output/ci-outcome-summary.json
+            --summary /freqtrade/user_data/v3_output/ci-outcome-summary.json \
+            --chart-dir /freqtrade/user_data/v3_charts
 
       - name: Track unique setups and outcomes
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -110,6 +120,7 @@ jobs:
             --snapshot /freqtrade/user_data/v3_output/latest.json
             --state /freqtrade/user_data/v3_state/outcomes.json
             --summary /freqtrade/user_data/v3_state/outcome_summary.json
+            --chart-dir /freqtrade/user_data/v3_charts
           )
 
           if [[ "$EVENT_NAME" == "schedule" || "$MANUAL_SEND" == "true" ]]; then
@@ -164,5 +175,6 @@ jobs:
           path: |
             user_data/v3_output/
             user_data/v3_state/outcome_summary.json
+            user_data/v3_charts/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 90
