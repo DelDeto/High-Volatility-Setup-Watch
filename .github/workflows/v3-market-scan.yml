@@ -27,7 +27,7 @@ on:
       - v3.4-free-redundancy
       - v3.4.1-supabase-activation
       - v3.4.3-concurrency-isolation
-      - main
+      - v3.4.4-production-queue
     paths:
       - "user_data/v3/**"
       - "user_data/strategies/MarketOpportunityStrategy.py"
@@ -39,7 +39,7 @@ permissions:
 
 concurrency:
   group: v3-market-opportunity-scan-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   scan:
