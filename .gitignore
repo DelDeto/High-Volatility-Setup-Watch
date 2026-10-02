@@ -16,3 +16,5 @@ user_data/*.sqlite*
 user_data/v3_output/
 
 user_data/v3_charts/
+
+user_data/.chartdeps/
