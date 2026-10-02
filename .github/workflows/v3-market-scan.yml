@@ -26,6 +26,7 @@ on:
     branches:
       - v3.4-free-redundancy
       - v3.4.1-supabase-activation
+      - v3.4.3-concurrency-isolation
       - main
     paths:
       - "user_data/v3/**"
@@ -37,7 +38,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: v3-market-opportunity-scan
+  group: v3-market-opportunity-scan-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
