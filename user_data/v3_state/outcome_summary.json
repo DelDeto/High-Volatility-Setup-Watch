@@ -1,10 +1,11 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-02T14:08:58.153479+00:00",
-  "unique_setups": 3,
-  "ready_unique": 0,
+  "generated_at": "2026-10-02T15:00:38.008991+00:00",
+  "unique_setups": 4,
+  "ready_unique": 1,
   "tracking_counts": {
-    "MONITORING": 3
+    "MONITORING": 3,
+    "PENDING_ENTRY": 1
   },
   "completed_trade_outcomes": 0,
   "tp": 0,
@@ -17,7 +18,7 @@
   "profit_factor_r": null,
   "by_setup": {
     "trend_pullback": {
-      "records": 3,
+      "records": 4,
       "completed": 0,
       "wins_tp": 0,
       "losses_sl": 0,
@@ -28,7 +29,7 @@
   },
   "by_side": {
     "LONG": {
-      "records": 3,
+      "records": 4,
       "completed": 0,
       "wins_tp": 0,
       "losses_sl": 0,
@@ -39,7 +40,7 @@
   },
   "by_volatility": {
     "HIGH": {
-      "records": 2,
+      "records": 3,
       "completed": 0,
       "wins_tp": 0,
       "losses_sl": 0,
@@ -75,6 +76,15 @@
       "win_rate_tp_sl": null,
       "average_r": null,
       "profit_factor_r": null
+    },
+    "0.90-1.04x": {
+      "records": 1,
+      "completed": 0,
+      "wins_tp": 0,
+      "losses_sl": 0,
+      "win_rate_tp_sl": null,
+      "average_r": null,
+      "profit_factor_r": null
     }
   },
   "by_obstacle_clearance": {
@@ -95,11 +105,20 @@
       "win_rate_tp_sl": null,
       "average_r": null,
       "profit_factor_r": null
+    },
+    "0.75-0.99R": {
+      "records": 1,
+      "completed": 0,
+      "wins_tp": 0,
+      "losses_sl": 0,
+      "win_rate_tp_sl": null,
+      "average_r": null,
+      "profit_factor_r": null
     }
   },
   "by_score": {
     "<85": {
-      "records": 3,
+      "records": 4,
       "completed": 0,
       "wins_tp": 0,
       "losses_sl": 0,
@@ -111,6 +130,15 @@
   "by_rr": {
     "<2.5R": {
       "records": 3,
+      "completed": 0,
+      "wins_tp": 0,
+      "losses_sl": 0,
+      "win_rate_tp_sl": null,
+      "average_r": null,
+      "profit_factor_r": null
+    },
+    "2.5-2.99R": {
+      "records": 1,
       "completed": 0,
       "wins_tp": 0,
       "losses_sl": 0,
@@ -139,6 +167,15 @@
       "profit_factor_r": null
     },
     ">=0.60 ATR": {
+      "records": 1,
+      "completed": 0,
+      "wins_tp": 0,
+      "losses_sl": 0,
+      "win_rate_tp_sl": null,
+      "average_r": null,
+      "profit_factor_r": null
+    },
+    "0.35-0.59 ATR": {
       "records": 1,
       "completed": 0,
       "wins_tp": 0,
