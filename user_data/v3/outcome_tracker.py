@@ -507,10 +507,12 @@ def group_stats(records: list[dict[str, Any]], key_fn) -> dict[str, Any]:
 
 
 def atr_expansion_bucket(record: dict[str, Any]) -> str:
-    value = finite(
-        record.get("atr_expansion"),
-        finite(record.get("latest_atr_expansion"), 0.0),
-    )
+    raw = record.get("atr_expansion")
+    if raw is None:
+        raw = record.get("latest_atr_expansion")
+    if raw is None:
+        return "unknown"
+    value = finite(raw)
     if value < 0.90:
         return "<0.90x"
     if value < 1.05:
@@ -521,10 +523,12 @@ def atr_expansion_bucket(record: dict[str, Any]) -> str:
 
 
 def obstacle_bucket(record: dict[str, Any]) -> str:
-    value = finite(
-        record.get("obstacle_clearance_r"),
-        finite(record.get("latest_obstacle_clearance_r"), 0.0),
-    )
+    raw = record.get("obstacle_clearance_r")
+    if raw is None:
+        raw = record.get("latest_obstacle_clearance_r")
+    if raw is None:
+        return "unknown"
+    value = finite(raw)
     if value < 0.75:
         return "<0.75R"
     if value < 1.00:
