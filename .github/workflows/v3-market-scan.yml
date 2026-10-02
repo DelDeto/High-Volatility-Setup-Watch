@@ -151,29 +151,6 @@ jobs:
             freqtrade \
             /freqtrade/user_data/v3/outcome_tracker.py "${ARGS[@]}"
 
-
-      - name: Alert production scan failure
-        if: failure() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          set -euo pipefail
-          TEXT="🚨 V3.2 SCANNER FAILURE
-
-A production market scan failed.
-Event: ${{ github.event_name }}
-Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-V3.3 Watchdog will attempt automatic recovery if the scanner remains stale."
-
-          RESPONSE=$(curl -sS -X POST \
-            "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
-            --data-urlencode "text=$TEXT")
-
-          echo "$RESPONSE" | jq -e '.ok == true' >/dev/null
-
       - name: Add reports to job summary
         if: always()
         run: |
