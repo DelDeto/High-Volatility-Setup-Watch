@@ -46,6 +46,9 @@ class Opportunity:
     opportunity_value: float
     quote_volume: float
     volume_rank: int
+    atr_expansion: float = 1.0
+    obstacle_clearance_r: float = 99.0
+    quality_gates: str = "PASS"
     conflict_resolved: bool = False
     rank: int | None = None
 
@@ -191,6 +194,8 @@ def analyze_symbol(
     d["ema50"] = ta.EMA(d, timeperiod=50)
     d["atr"] = ta.ATR(d, timeperiod=14)
     d["rsi"] = ta.RSI(d, timeperiod=14)
+    d["atr_baseline96"] = d["atr"].rolling(96, min_periods=48).median()
+    d["atr_expansion"] = d["atr"] / d["atr_baseline96"].replace(0, np.nan)
     d["volume_mean20"] = d["volume"].rolling(20, min_periods=20).mean()
     d["volume_ratio"] = d["volume"] / d["volume_mean20"].replace(0, np.nan)
     d["prior_high20"] = d["high"].rolling(20, min_periods=20).max().shift(1)
@@ -231,8 +236,9 @@ def analyze_symbol(
     r4 = h4.iloc[-1]
 
     required_values = [
-        row["close"], row["atr"], row["range_24h"], r1["ema20"], r1["atr"],
-        r1["demand"], r1["supply"], r4["demand"], r4["supply"],
+        row["close"], row["atr"], row["atr_expansion"], row["range_24h"],
+        r1["ema20"], r1["atr"], r1["demand"], r1["supply"],
+        r4["demand"], r4["supply"],
     ]
     if not all(math.isfinite(finite(x, np.nan)) for x in required_values):
         return []
@@ -242,6 +248,7 @@ def analyze_symbol(
     atr_1h = finite(r1["atr"])
     range_24h = finite(row["range_24h"])
     volume_ratio = finite(row["volume_ratio"])
+    atr_expansion = finite(row["atr_expansion"], np.nan)
 
     if range_24h >= 0.25:
         regime = 3
@@ -279,6 +286,25 @@ def analyze_symbol(
     long_rr = (long_target - entry) / long_risk if long_risk > 0 and long_target > entry else float("nan")
     short_rr = (entry - short_target) / short_risk if short_risk > 0 and short_target < entry else float("nan")
 
+    # V3.5 target-path quality: use the nearest 15m swing between entry and
+    # structural target as an obstacle. A clean path needs >= 0.75R clearance.
+    long_local_obstacle = (
+        finite(row["prior_high20"])
+        if finite(row["prior_high20"]) > entry and finite(row["prior_high20"]) < long_target
+        else long_target
+    )
+    short_local_obstacle = (
+        finite(row["prior_low20"])
+        if finite(row["prior_low20"]) < entry and finite(row["prior_low20"]) > short_target
+        else short_target
+    )
+    long_obstacle_clearance_r = (
+        (long_local_obstacle - entry) / long_risk if long_risk > 0 else float("nan")
+    )
+    short_obstacle_clearance_r = (
+        (entry - short_local_obstacle) / short_risk if short_risk > 0 else float("nan")
+    )
+
     bull_1h = int(r1["bull_structure"]) == 1
     bear_1h = int(r1["bear_structure"]) == 1
     bull_4h = int(r4["bull_structure"]) == 1
@@ -304,6 +330,7 @@ def analyze_symbol(
     long_breakout_retest = (
         recent_breakout_long
         and bull_1h
+        and not bear_4h
         and abs(entry - prior_high20) / atr <= 0.55
         and entry >= prior_high20
         and volume_ratio >= 1.10
@@ -311,6 +338,7 @@ def analyze_symbol(
     short_breakout_retest = (
         recent_breakout_short
         and bear_1h
+        and not bull_4h
         and abs(entry - prior_low20) / atr <= 0.55
         and entry <= prior_low20
         and volume_ratio >= 1.10
@@ -337,6 +365,8 @@ def analyze_symbol(
     long_high_vol = (
         regime >= 1
         and bull_1h
+        and not bear_4h
+        and atr_expansion >= 1.05
         and recent_breakout_long
         and entry > finite(row["ema20"])
         and volume_ratio >= 1.40
@@ -345,6 +375,8 @@ def analyze_symbol(
     short_high_vol = (
         regime >= 1
         and bear_1h
+        and not bull_4h
+        and atr_expansion >= 1.05
         and recent_breakout_short
         and entry < finite(row["ema20"])
         and volume_ratio >= 1.40
@@ -374,6 +406,13 @@ def analyze_symbol(
     short_confirmation = reclaim_short or ema_touch_short or choch_short
     long_location_quality = long_location or long_pullback_location or long_breakout_retest
     short_location_quality = short_location or short_pullback_location or short_breakout_retest
+
+    long_mtf_hard_gate = not bear_4h
+    short_mtf_hard_gate = not bull_4h
+    long_obstacle_gate = long_obstacle_clearance_r >= 0.75
+    short_obstacle_gate = short_obstacle_clearance_r >= 0.75
+    ready_expansion_gate = regime == 0 or atr_expansion >= 0.90
+    developing_expansion_gate = regime == 0 or atr_expansion >= 0.80
 
     long_score = (
         20 * int(bull_4h)
@@ -412,12 +451,25 @@ def analyze_symbol(
         target: float,
         location_quality: bool,
         distance: float,
+        mtf_gate: bool,
+        obstacle_gate: bool,
+        obstacle_clearance_r: float,
     ) -> None:
-        if setup == "none" or not math.isfinite(rr) or not location_quality:
+        if (
+            setup == "none"
+            or not math.isfinite(rr)
+            or not location_quality
+            or not mtf_gate
+            or not obstacle_gate
+        ):
             return
-        if score >= req_score and rr >= req_rr:
+        if score >= req_score and rr >= req_rr and ready_expansion_gate:
             status = "READY"
-        elif score >= req_score - 8 and rr >= req_rr * 0.80:
+        elif (
+            score >= req_score - 8
+            and rr >= req_rr * 0.80
+            and developing_expansion_gate
+        ):
             status = "DEVELOPING"
         else:
             return
@@ -448,16 +500,21 @@ def analyze_symbol(
                 opportunity_value=opportunity_value,
                 quote_volume=quote_volume,
                 volume_rank=volume_rank,
+                atr_expansion=atr_expansion,
+                obstacle_clearance_r=obstacle_clearance_r,
+                quality_gates="PASS",
             )
         )
 
     build(
         "LONG", long_setup_name, long_score, long_req_score, long_rr, long_req_rr,
-        long_stop, long_target, long_location_quality, min(long_entry_dist, long_pullback_dist)
+        long_stop, long_target, long_location_quality, min(long_entry_dist, long_pullback_dist),
+        long_mtf_hard_gate, long_obstacle_gate, long_obstacle_clearance_r,
     )
     build(
         "SHORT", short_setup_name, short_score, short_req_score, short_rr, short_req_rr,
-        short_stop, short_target, short_location_quality, min(short_entry_dist, short_pullback_dist)
+        short_stop, short_target, short_location_quality, min(short_entry_dist, short_pullback_dist),
+        short_mtf_hard_gate, short_obstacle_gate, short_obstacle_clearance_r,
     )
     return opportunities
 
@@ -576,7 +633,7 @@ def rank_opportunities(opportunities: list[Opportunity], top_n: int) -> list[Opp
 
 def report_text(snapshot: dict[str, Any]) -> str:
     lines = [
-        "# Market Opportunity Scanner V3",
+        "# Market Opportunity Scanner V3.5",
         "",
         f"Generated: {snapshot['generated_at']}",
         f"Exchange: Gate USDT perpetual",
@@ -605,6 +662,8 @@ def report_text(snapshot: dict[str, Any]) -> str:
                 f"- Score: {item['score']} / required {item['required_score']}",
                 f"- Volatility: {item['volatility_regime']} ({item['range_24h_pct']:.1f}% / 24h)",
                 f"- Entry distance: {item['entry_distance_atr']:.2f} ATR",
+                f"- ATR expansion: {item['atr_expansion']:.2f}x",
+                f"- Obstacle clearance: {item['obstacle_clearance_r']:.2f}R",
                 f"- Opportunity value: {item['opportunity_value']:.1f}",
                 "",
             ]
@@ -617,17 +676,25 @@ def telegram_text(snapshot: dict[str, Any]) -> str:
     if not items:
         return ""
     lines = [
-        "🚀 MARKET OPPORTUNITY V3",
+        "🚀 MARKET OPPORTUNITY V3.5",
         f"Gate | READY {snapshot['ready_count']} | DEV {snapshot['developing_count']}",
         "",
     ]
     for item in items:
         icon = "🟢" if item["status"] == "READY" else "🟡"
+        lines.append(
+            f"{icon} #{item['rank']} {item['symbol']} {item['side']} | {item['setup']}"
+        )
+        if item["status"] == "READY":
+            lines.append(
+                f"E {price_fmt(item['entry'])} | SL {price_fmt(item['stop'])} | TP {price_fmt(item['target'])}"
+            )
+        else:
+            lines.append("WATCHLIST ONLY — no entry until status becomes READY")
         lines.extend(
             [
-                f"{icon} #{item['rank']} {item['symbol']} {item['side']} | {item['setup']}",
-                f"E {price_fmt(item['entry'])} | SL {price_fmt(item['stop'])} | TP {price_fmt(item['target'])}",
                 f"RR {item['rr']:.2f}R | S {item['score']} | {item['volatility_regime']} | OV {item['opportunity_value']:.1f}",
+                f"ATR exp {item['atr_expansion']:.2f}x | clear path {item['obstacle_clearance_r']:.2f}R",
                 "",
             ]
         )
@@ -741,7 +808,7 @@ def run_scan(args) -> dict[str, Any]:
     ready_count = sum(1 for x in resolved if x.status == "READY")
     developing_count = sum(1 for x in resolved if x.status == "DEVELOPING")
     snapshot = {
-        "version": "V3.4",
+        "version": "V3.5",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "scan_as_of": (
             datetime.fromtimestamp(SCAN_AS_OF_MS / 1000, tz=timezone.utc).isoformat()
@@ -779,7 +846,7 @@ def self_test() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="V3 cross-market Gate opportunity ranker")
+    parser = argparse.ArgumentParser(description="V3.5 quality-calibrated Gate opportunity ranker")
     parser.add_argument("--universe", type=int, default=150)
     parser.add_argument("--deep-limit", type=int, default=80)
     parser.add_argument("--top-n", type=int, default=10)
