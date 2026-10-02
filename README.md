@@ -454,9 +454,10 @@ Every ranked setup and frozen READY outcome stores:
 - `obstacle_clearance_r`
 - `quality_gates`
 
-The outcome summary segments results by ATR-expansion and obstacle-clearance
-buckets. These features can therefore be promoted into future entry gates only
-after forward/out-of-sample evidence supports a cutoff.
+The outcome summary segments results by ATR-expansion, obstacle-clearance,
+score, RR and entry-distance buckets. These features can therefore be promoted
+into future entry gates only after forward/out-of-sample evidence supports a
+cutoff.
 
 ### 90-day A/B safeguard
 
