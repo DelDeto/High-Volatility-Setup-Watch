@@ -1,7 +1,5 @@
 name: V3.4 Redundancy Watchdog
 
-# V3.4.2 external watchdog bootstrap
-
 on:
   schedule:
     - cron: "0,15,30,45 * * * *"
@@ -14,7 +12,7 @@ on:
   push:
     branches:
       - v3.4-free-redundancy
-      - v3.4.3-concurrency-isolation
+      - v3.4-external-watchdog
       - main
     paths:
       - ".github/workflows/v3-watchdog.yml"
@@ -24,7 +22,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: v3-scanner-watchdog-${{ github.ref }}
+  group: v3-scanner-watchdog
   cancel-in-progress: false
 
 jobs:
@@ -140,7 +138,7 @@ jobs:
 
             CANDIDATE=$(echo "$CHECK" | jq -c --argjson start "$START_EPOCH" '
               [.workflow_runs[]
-               | select(.event == "workflow_dispatch")
+               | select(.event == "workflow_dispatch" or .event == "schedule")
                | . + {epoch: (.created_at | fromdateiso8601)}
                | select(.epoch >= ($start - 10))]
               | sort_by(.epoch) | reverse | .[0] // null
