@@ -88,6 +88,12 @@ jobs:
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/delivery_ledger.py
 
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/supabase_heartbeat.py \
+            --scan-state /freqtrade/user_data/v3_state/scan_state.json \
+            --delivery-state /freqtrade/user_data/v3_state/delivery.json \
+            --self-test
+
       - name: Prepare persistent state
         run: |
           mkdir -p user_data/v3_output user_data/v3_state user_data/v3_charts
@@ -289,6 +295,21 @@ jobs:
             --run-id "$RUN_ID" \
             --event "$EVENT_NAME" \
             --catchup-count "$MISSED_COUNT"
+
+      - name: Sync external Supabase heartbeat
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          SUPABASE_PROJECT_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          docker compose run --rm \
+            --entrypoint python \
+            -e SUPABASE_PROJECT_URL \
+            -e SUPABASE_SECRET_KEY \
+            freqtrade \
+            /freqtrade/user_data/v3/supabase_heartbeat.py \
+            --scan-state /freqtrade/user_data/v3_state/scan_state.json \
+            --delivery-state /freqtrade/user_data/v3_state/delivery.json
 
       - name: Add reports to job summary
         if: always()
