@@ -20,11 +20,14 @@ jobs:
         run: docker compose config
       - name: Pull Freqtrade stable
         run: docker compose pull
-      - name: Load strategy
+      - name: Load strategies
         run: |
           set -euo pipefail
           docker compose run --rm freqtrade list-strategies --strategy-path /freqtrade/user_data/strategies 2>&1 | tee /tmp/strategy.log
           if grep -Eq "CRITICAL|ERROR -" /tmp/strategy.log; then exit 1; fi
+      - name: Validate V3 ranker
+        run: |
+          docker compose run --rm freqtrade python /freqtrade/user_data/v3/market_ranker.py --self-test
       - name: Validate live Gate crypto pairlist
         run: |
           set -euo pipefail
