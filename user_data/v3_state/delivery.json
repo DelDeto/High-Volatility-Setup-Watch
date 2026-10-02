@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-02T15:00:41.882903+00:00",
+  "updated_at": "2026-10-02T19:20:58.417680+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -52,6 +52,110 @@
       "created_at": "2026-10-02T15:00:38.008967+00:00",
       "last_attempt_at": "2026-10-02T15:00:40.159024+00:00",
       "sent_at": "2026-10-02T15:00:41.882403+00:00",
+      "last_error": null
+    },
+    "signal:516f77329bc7a49f:new": {
+      "key": "signal:516f77329bc7a49f:new",
+      "kind": "signal_text",
+      "signal_id": "516f77329bc7a49f",
+      "timeframe": null,
+      "text": "🚀 V3.5 READY\nMUBARAK/USDT:USDT LONG | trend_pullback\nEntry 0.062520\nSL 0.060158 | TP 0.069420\nRR 2.92R | Score 87\nRegime VERY_HIGH | Rank #1\nID 516f77329bc7a49f",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-02T19:12:51.026982+00:00",
+      "last_attempt_at": "2026-10-02T19:12:51.028200+00:00",
+      "sent_at": "2026-10-02T19:12:51.686012+00:00",
+      "last_error": null
+    },
+    "signal:516f77329bc7a49f:chart:4h": {
+      "key": "signal:516f77329bc7a49f:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "516f77329bc7a49f",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-02T19:12:51.026990+00:00",
+      "last_attempt_at": "2026-10-02T19:12:51.686035+00:00",
+      "sent_at": "2026-10-02T19:12:53.903855+00:00",
+      "last_error": null
+    },
+    "signal:516f77329bc7a49f:chart:1h": {
+      "key": "signal:516f77329bc7a49f:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "516f77329bc7a49f",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-02T19:12:51.026996+00:00",
+      "last_attempt_at": "2026-10-02T19:12:53.903872+00:00",
+      "sent_at": "2026-10-02T19:12:56.091029+00:00",
+      "last_error": null
+    },
+    "signal:6e3e02005249619d:new": {
+      "key": "signal:6e3e02005249619d:new",
+      "kind": "signal_text",
+      "signal_id": "6e3e02005249619d",
+      "timeframe": null,
+      "text": "🚀 V3.5 READY\nRESOLV/USDT:USDT LONG | trend_pullback\nEntry 0.020270\nSL 0.019343 | TP 0.022590\nRR 2.50R | Score 87\nRegime VERY_HIGH | Rank #1\nID 6e3e02005249619d",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-02T19:14:13.917359+00:00",
+      "last_attempt_at": "2026-10-02T19:14:13.918664+00:00",
+      "sent_at": "2026-10-02T19:14:14.633032+00:00",
+      "last_error": null
+    },
+    "signal:6e3e02005249619d:chart:4h": {
+      "key": "signal:6e3e02005249619d:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "6e3e02005249619d",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-02T19:14:13.917368+00:00",
+      "last_attempt_at": "2026-10-02T19:14:14.633056+00:00",
+      "sent_at": "2026-10-02T19:14:16.684929+00:00",
+      "last_error": null
+    },
+    "signal:6e3e02005249619d:chart:1h": {
+      "key": "signal:6e3e02005249619d:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "6e3e02005249619d",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-02T19:14:13.917373+00:00",
+      "last_attempt_at": "2026-10-02T19:14:16.684948+00:00",
+      "sent_at": "2026-10-02T19:14:18.616429+00:00",
+      "last_error": null
+    },
+    "outcome:516f77329bc7a49f:SL": {
+      "key": "outcome:516f77329bc7a49f:SL",
+      "kind": "outcome_text",
+      "signal_id": "516f77329bc7a49f",
+      "timeframe": null,
+      "text": "📊 V3.5 OUTCOME SL\nMUBARAK/USDT:USDT LONG | trend_pullback\nID 516f77329bc7a49f\nActual R: -1.00R\nMFE +0.12R | MAE -1.14R",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-02T19:20:57.076065+00:00",
+      "last_attempt_at": "2026-10-02T19:20:57.077501+00:00",
+      "sent_at": "2026-10-02T19:20:57.737238+00:00",
+      "last_error": null
+    },
+    "outcome:6e3e02005249619d:SL": {
+      "key": "outcome:6e3e02005249619d:SL",
+      "kind": "outcome_text",
+      "signal_id": "6e3e02005249619d",
+      "timeframe": null,
+      "text": "📊 V3.5 OUTCOME SL\nRESOLV/USDT:USDT LONG | trend_pullback\nID 6e3e02005249619d\nActual R: -1.00R\nMFE +0.09R | MAE -1.28R",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-02T19:20:57.076080+00:00",
+      "last_attempt_at": "2026-10-02T19:20:57.737309+00:00",
+      "sent_at": "2026-10-02T19:20:58.417056+00:00",
       "last_error": null
     }
   }
