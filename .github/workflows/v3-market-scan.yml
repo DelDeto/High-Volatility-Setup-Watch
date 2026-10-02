@@ -207,6 +207,43 @@ jobs:
             --delivery-state /freqtrade/user_data/v3_state/delivery.json \
             --chart-dir /freqtrade/user_data/v3_charts
 
+      - name: CI-test historical catch-up
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SLOT=$(date -u -d '30 minutes ago' '+%Y-%m-%dT%H:%M:00+00:00')
+          MINUTE=$(date -u -d "$SLOT" '+%M')
+          SLOT_MIN=$((10#$MINUTE / 15 * 15))
+          SLOT=$(date -u -d "$SLOT" '+%Y-%m-%dT%H:')$(printf '%02d' "$SLOT_MIN")":00+00:00"
+
+          mkdir -p user_data/v3_output/catchup-smoke
+          chmod 0777 user_data/v3_output/catchup-smoke
+
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/market_ranker.py \
+            --universe 40 \
+            --deep-limit 20 \
+            --top-n 5 \
+            --as-of "$SLOT" \
+            --output-dir /freqtrade/user_data/v3_output/catchup-smoke
+
+          cp user_data/v3_state/outcomes.json user_data/v3_output/ci-catchup-outcomes.json
+          cp user_data/v3_state/delivery.json user_data/v3_output/ci-catchup-delivery.json
+          chmod 0666 user_data/v3_output/ci-catchup-outcomes.json user_data/v3_output/ci-catchup-delivery.json
+
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/outcome_tracker.py \
+            --snapshot /freqtrade/user_data/v3_output/catchup-smoke/latest.json \
+            --state /freqtrade/user_data/v3_output/ci-catchup-outcomes.json \
+            --summary /freqtrade/user_data/v3_output/ci-catchup-summary.json \
+            --delivery-state /freqtrade/user_data/v3_output/ci-catchup-delivery.json \
+            --chart-dir /freqtrade/user_data/v3_charts \
+            --observed-at "$SLOT" \
+            --ingest-only
+
+          echo "V34_HISTORICAL_CATCHUP_SMOKE_OK slot=$SLOT"
+
       - name: Track current outcomes and flush Telegram delivery
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
