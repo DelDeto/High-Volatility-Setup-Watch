@@ -12,10 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import ccxt
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+import importlib.util
 import numpy as np
 import pandas as pd
 import talib.abstract as ta
@@ -80,7 +77,16 @@ def add_chart_indicators(df: pd.DataFrame, timeframe: str) -> pd.DataFrame:
     return out
 
 
+def _mpl():
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Rectangle
+    return plt, Rectangle
+
+
 def _draw_candles(ax, df: pd.DataFrame) -> None:
+    _, Rectangle = _mpl()
     width = 0.62
     for i, row in df.iterrows():
         o, h, l, c = (finite(row[x]) for x in ("open", "high", "low", "close"))
@@ -129,6 +135,7 @@ def generate_chart(
     raw = closed_ohlcv(exchange, record["symbol"], timeframe, max(candles + 220, 340))
     df = add_chart_indicators(raw, timeframe).tail(candles).reset_index(drop=True)
 
+    plt, _ = _mpl()
     fig, ax = plt.subplots(figsize=(13.5, 7.5))
     _draw_candles(ax, df)
 
@@ -264,7 +271,13 @@ def telegram_send_photo(photo_path: str, caption: str = "") -> bool:
     return True
 
 
+def dependency_report() -> dict[str, bool]:
+    names = ["matplotlib", "PIL", "plotly", "kaleido", "cairosvg"]
+    return {name: importlib.util.find_spec(name) is not None for name in names}
+
+
 def self_test(output_dir: Path) -> None:
+    print("IMAGE_DEPENDENCIES", json.dumps(dependency_report(), sort_keys=True))
     dates = pd.date_range("2026-01-01", periods=340, freq="h", tz="UTC")
     base = np.linspace(90, 110, len(dates))
     df = pd.DataFrame(
