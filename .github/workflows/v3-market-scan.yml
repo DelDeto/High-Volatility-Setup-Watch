@@ -90,7 +90,8 @@ jobs:
       - name: Prepare runtime directories
         run: |
           mkdir -p user_data/v3_output user_data/v3_state user_data/v3_charts
-          chmod -R 0777 user_data/v3_output user_data/v3_state user_data/v3_charts
+          chmod 0777 user_data/v3_output user_data/v3_state user_data/v3_charts
+          chmod 0666 user_data/v3_state/outcomes.json user_data/v3_state/outcome_summary.json
           test -w user_data/v3_state/outcomes.json
           test -w user_data/v3_state/outcome_summary.json
 
