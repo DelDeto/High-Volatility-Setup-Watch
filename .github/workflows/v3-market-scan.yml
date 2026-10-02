@@ -25,6 +25,7 @@ on:
   push:
     branches:
       - freqtrade-migration
+      - main
     paths:
       - "user_data/v3/**"
       - "user_data/strategies/MarketOpportunityStrategy.py"
