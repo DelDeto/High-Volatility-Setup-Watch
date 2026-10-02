@@ -16,6 +16,8 @@ from typing import Any
 
 import ccxt
 
+from chart_generator import generate_ready_charts, telegram_send_photo
+
 
 TERMINAL = {"TP", "SL", "TIMEOUT", "EXPIRED", "AMBIGUOUS"}
 TRADE_TERMINAL = {"TP", "SL", "TIMEOUT", "AMBIGUOUS"}
@@ -201,6 +203,8 @@ def create_record(item: dict[str, Any], now: datetime) -> dict[str, Any]:
         "actual_r": None,
         "exit_price": None,
         "hold_hours": None,
+        "charts": {},
+        "chart_generated_at": None,
         "notes": [],
     }
     if status == "READY":
@@ -499,7 +503,7 @@ def build_summary(state: dict[str, Any]) -> dict[str, Any]:
     tp_sl = [r for r in records if r.get("tracking_status") in {"TP", "SL"}]
 
     return {
-        "version": "V3.1",
+        "version": "V3.2",
         "generated_at": iso(),
         "unique_setups": len(records),
         "ready_unique": sum(1 for r in records if r.get("ready_at")),
@@ -551,6 +555,33 @@ def telegram_send(text: str) -> bool:
         if not body.get("ok"):
             raise RuntimeError(f"Telegram send failed: {body}")
     return True
+
+
+def ensure_ready_charts(
+    exchange,
+    record: dict[str, Any],
+    chart_dir: Path,
+) -> bool:
+    if record.get("tracking_status") not in {"PENDING_ENTRY", "ACTIVE", "TP", "SL", "TIMEOUT"}:
+        return False
+    charts = record.get("charts") or {}
+    existing = all(Path(p).exists() for p in charts.values()) if charts else False
+    if existing and {"1h", "4h"}.issubset(charts):
+        return False
+
+    generated = generate_ready_charts(exchange, record, chart_dir)
+    record["charts"] = generated
+    record["chart_generated_at"] = iso()
+    return True
+
+
+def ready_chart_caption(record: dict[str, Any], timeframe: str) -> str:
+    label = "4H CONTEXT" if timeframe == "4h" else "1H SETUP / ENTRY"
+    return (
+        f"{label} | {record['symbol']} {record['side']}\n"
+        f"{record['setup']} | RR {finite(record.get('rr')):.2f}R | "
+        f"Score {record.get('score')} | ID {record.get('signal_id')}"
+    )
 
 
 def signal_alert(record: dict[str, Any], promoted: bool = False) -> str:
@@ -607,13 +638,14 @@ def run_tracker(args) -> dict[str, Any]:
     state = load_json(
         state_path,
         {
-            "version": "V3.1",
+            "version": "V3.2",
             "created_at": iso(now),
             "updated_at": iso(now),
             "records": [],
         },
     )
 
+    state["version"] = "V3.2"
     exchange = build_exchange()
     outcome_events = []
     for record in state.get("records", []):
@@ -641,6 +673,17 @@ def run_tracker(args) -> dict[str, Any]:
         state, snapshot, now, args.cooldown_hours
     )
 
+    chart_records = []
+    for record in [*ingest_events["new"], *ingest_events["promoted"]]:
+        if record.get("tracking_status") == "PENDING_ENTRY":
+            try:
+                if ensure_ready_charts(exchange, record, Path(args.chart_dir)):
+                    chart_records.append(record)
+            except Exception as exc:  # noqa: BLE001
+                record.setdefault("notes", []).append(
+                    f"chart_error:{type(exc).__name__}:{str(exc)[:160]}"
+                )
+
     state["updated_at"] = iso(now)
     summary = build_summary(state)
     save_json(state_path, state)
@@ -665,8 +708,19 @@ def run_tracker(args) -> dict[str, Any]:
     if args.telegram:
         for record in ingest_events["new"]:
             telegram_send(signal_alert(record, promoted=False))
+            if record.get("tracking_status") == "PENDING_ENTRY":
+                charts = record.get("charts") or {}
+                if charts.get("4h"):
+                    telegram_send_photo(charts["4h"], ready_chart_caption(record, "4h"))
+                if charts.get("1h"):
+                    telegram_send_photo(charts["1h"], ready_chart_caption(record, "1h"))
         for record in ingest_events["promoted"]:
             telegram_send(signal_alert(record, promoted=True))
+            charts = record.get("charts") or {}
+            if charts.get("4h"):
+                telegram_send_photo(charts["4h"], ready_chart_caption(record, "4h"))
+            if charts.get("1h"):
+                telegram_send_photo(charts["1h"], ready_chart_caption(record, "1h"))
         for event in outcome_events:
             message = outcome_alert(event)
             if message:
@@ -678,6 +732,7 @@ def run_tracker(args) -> dict[str, Any]:
         "promoted": len(ingest_events["promoted"]),
         "suppressed": len(ingest_events["suppressed"]),
         "outcome_events": len(outcome_events),
+        "charts_generated": len(chart_records),
     }
 
 
@@ -701,7 +756,7 @@ def self_test() -> None:
         "entry_distance_atr": 0.2,
         "opportunity_value": 101.0,
     }
-    state = {"version": "V3.1", "records": []}
+    state = {"version": "V3.2", "records": []}
     first = ingest_snapshot(state, {"top_opportunities": [ready]}, now, 12)
     assert len(first["new"]) == 1
     assert state["records"][0]["tracking_status"] == "PENDING_ENTRY"
@@ -750,10 +805,11 @@ def self_test() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="V3.1 deterministic outcome tracker")
+    parser = argparse.ArgumentParser(description="V3.2 deterministic outcome tracker")
     parser.add_argument("--snapshot", default="/freqtrade/user_data/v3_output/latest.json")
     parser.add_argument("--state", default="/freqtrade/user_data/v3_state/outcomes.json")
     parser.add_argument("--summary", default="/freqtrade/user_data/v3_state/outcome_summary.json")
+    parser.add_argument("--chart-dir", default="/freqtrade/user_data/v3_charts")
     parser.add_argument("--entry-window-hours", type=int, default=6)
     parser.add_argument("--max-hold-hours", type=int, default=168)
     parser.add_argument("--developing-stale-hours", type=int, default=12)

@@ -6,6 +6,7 @@ services:
     volumes:
       - "./user_data:/freqtrade/user_data"
     environment:
+      PYTHONPATH: /freqtrade/user_data/.chartdeps
       FREQTRADE__EXCHANGE__KEY: ${FREQTRADE__EXCHANGE__KEY:-}
       FREQTRADE__EXCHANGE__SECRET: ${FREQTRADE__EXCHANGE__SECRET:-}
       FREQTRADE__TELEGRAM__ENABLED: ${FREQTRADE__TELEGRAM__ENABLED:-false}

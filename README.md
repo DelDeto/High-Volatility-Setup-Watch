@@ -262,7 +262,7 @@ Scheduled runs persist state back to `main` using a `[skip ci]` commit so the 15
 
 ### Telegram deduplication
 
-Telegram is now driven by the outcome tracker, not directly by every scanner snapshot.
+Telegram is now driven by the outcome tracker, not directly by every scanner snapshot. V3.2 also attaches 4H + 1H charts to new READY or promoted-to-READY signals.
 
 It sends only meaningful events such as:
 
@@ -271,6 +271,43 @@ It sends only meaningful events such as:
 - a terminal TP / SL / TIMEOUT / AMBIGUOUS outcome.
 
 A setup that remains unchanged across multiple 15-minute scans is not re-alerted.
+
+
+## V3.2 Visual Signal Pack
+
+V3.2 adds automatic visual context for **READY** setups without changing any entry rule.
+
+For each new READY setup, or a DEVELOPING setup promoted to READY, the system generates:
+
+```text
+4H chart = market context
+1H chart = setup / entry context
+```
+
+Both charts include:
+
+- closed Gate candlesticks;
+- EMA20 / EMA50 / EMA200;
+- latest supply / demand reference;
+- frozen Entry / SL / TP;
+- setup name, side, RR, score, volatility regime and `signal_id`;
+- expected direction arrow.
+
+Telegram behavior for a READY setup becomes:
+
+```text
+READY text alert
+        ↓
+4H CONTEXT image
+        ↓
+1H SETUP / ENTRY image
+```
+
+DEVELOPING setups continue to receive text-only alerts. This keeps Telegram lighter while making READY signals easy to inspect visually.
+
+Charts are not committed into Git history. They are uploaded with the workflow artifact under `user_data/v3_charts/<signal_id>_.../` and retained for 90 days. The corresponding outcome record stores the generated chart paths and timestamp so charts remain linked to the setup ID used by the Outcome Tracker.
+
+This visual layer is descriptive only. It does not approve, reject or modify a trade signal.
 
 ## Quick start
 

@@ -1,4 +1,4 @@
-name: V3.1 Market Opportunity Scan
+name: V3.2 Market Opportunity Scan
 
 on:
   schedule:
@@ -24,7 +24,7 @@ on:
         default: "10"
   push:
     branches:
-      - v3.1-outcome-tracker
+      - v3.2-visual-signal-pack
       - main
     paths:
       - "user_data/v3/**"
@@ -50,6 +50,23 @@ jobs:
       - name: Pull Freqtrade stable
         run: docker compose pull
 
+      - name: Restore chart dependency cache
+        id: chart-cache
+        uses: actions/cache@v4
+        with:
+          path: user_data/.chartdeps
+          key: v3-chartdeps-matplotlib-v1
+
+      - name: Install chart dependency
+        if: steps.chart-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p user_data/.chartdeps
+          chmod 0777 user_data/.chartdeps
+          docker compose run --rm --entrypoint python freqtrade \
+            -m pip install --no-cache-dir \
+            --target /freqtrade/user_data/.chartdeps \
+            matplotlib
+
       - name: V3 ranker self-test
         run: |
           docker compose run --rm --entrypoint python freqtrade \
@@ -60,10 +77,19 @@ jobs:
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/outcome_tracker.py --self-test
 
+      - name: V3.2 chart self-test
+        run: |
+          mkdir -p user_data/v3_output/chart-self-test
+          chmod -R 0777 user_data/v3_output
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/chart_generator.py \
+            --self-test \
+            --output-dir /freqtrade/user_data/v3_output/chart-self-test
+
       - name: Prepare runtime directories
         run: |
-          mkdir -p user_data/v3_output user_data/v3_state
-          chmod 0777 user_data/v3_output user_data/v3_state
+          mkdir -p user_data/v3_output user_data/v3_state user_data/v3_charts
+          chmod 0777 user_data/v3_output user_data/v3_state user_data/v3_charts
 
       - name: Scan Gate market and rank Top-N
         shell: bash
@@ -95,7 +121,8 @@ jobs:
             /freqtrade/user_data/v3/outcome_tracker.py \
             --snapshot /freqtrade/user_data/v3_output/latest.json \
             --state /freqtrade/user_data/v3_output/ci-outcomes.json \
-            --summary /freqtrade/user_data/v3_output/ci-outcome-summary.json
+            --summary /freqtrade/user_data/v3_output/ci-outcome-summary.json \
+            --chart-dir /freqtrade/user_data/v3_charts
 
       - name: Track unique setups and outcomes
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -110,6 +137,7 @@ jobs:
             --snapshot /freqtrade/user_data/v3_output/latest.json
             --state /freqtrade/user_data/v3_state/outcomes.json
             --summary /freqtrade/user_data/v3_state/outcome_summary.json
+            --chart-dir /freqtrade/user_data/v3_charts
           )
 
           if [[ "$EVENT_NAME" == "schedule" || "$MANUAL_SEND" == "true" ]]; then
@@ -134,11 +162,11 @@ jobs:
 
           if [ -f user_data/v3_state/outcome_summary.json ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## V3.1 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.2 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
             cat user_data/v3_state/outcome_summary.json >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Persist V3.1 outcome state
+      - name: Persist V3.2 outcome state
         if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
@@ -152,11 +180,11 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Update V3.1 outcome state [skip ci]"
+          git commit -m "Update V3.2 outcome state [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
 
-      - name: Upload V3.1 artifacts
+      - name: Upload V3.2 artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -164,5 +192,6 @@ jobs:
           path: |
             user_data/v3_output/
             user_data/v3_state/outcome_summary.json
+            user_data/v3_charts/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 90
