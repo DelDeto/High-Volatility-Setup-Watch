@@ -1,4 +1,4 @@
-name: V3.4 Free Redundancy Market Scan
+name: V3.5 Quality-Calibrated Market Scan
 
 on:
   schedule:
@@ -50,7 +50,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore V3.4 persistent state branch
+      - name: Restore V3.5 persistent state branch
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           set -euo pipefail
@@ -88,7 +88,7 @@ jobs:
             --target /freqtrade/user_data/.chartdeps \
             matplotlib
 
-      - name: V3.4 self-tests
+      - name: V3.5 self-tests
         run: |
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/market_ranker.py --self-test
@@ -367,29 +367,29 @@ jobs:
           if [ -f user_data/v3_output/latest.md ]; then
             cat user_data/v3_output/latest.md >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "V3.4 snapshot was not produced." >> "$GITHUB_STEP_SUMMARY"
+            echo "V3.5 snapshot was not produced." >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [ -f user_data/v3_output/scan_plan.json ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## V3.4 Catch-up Plan" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.5 Catch-up Plan" >> "$GITHUB_STEP_SUMMARY"
             cat user_data/v3_output/scan_plan.json >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [ -f user_data/v3_state/outcome_summary.json ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## V3.4 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.5 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
             cat user_data/v3_state/outcome_summary.json >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [ -f user_data/v3_state/delivery.json ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## V3.4 Delivery State" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.5 Delivery State" >> "$GITHUB_STEP_SUMMARY"
             jq '{version,updated_at,pending:([.items[]|select(.status!="SENT")]|length),sent:([.items[]|select(.status=="SENT")]|length)}' \
               user_data/v3_state/delivery.json >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Persist V3.4 state
+      - name: Persist V3.5 state
         if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
@@ -442,7 +442,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v3-market-opportunity-snapshot
+          name: v35-market-opportunity-snapshot
           path: |
             user_data/v3_output/
             user_data/v3_state/outcome_summary.json
