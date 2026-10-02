@@ -84,7 +84,7 @@ def self_test() -> None:
     )
     assert payload["service"] == "v3-scanner"
     assert payload["pending_delivery"] == 1
-    assert payload["last_run_id"] == "123"
+    assert payload["run_id"] == "123"
     print("SUPABASE_HEARTBEAT_SELF_TEST_OK")
 
 
