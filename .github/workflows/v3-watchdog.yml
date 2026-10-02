@@ -14,6 +14,7 @@ on:
   push:
     branches:
       - v3.4-free-redundancy
+      - v3.4.3-concurrency-isolation
       - main
     paths:
       - ".github/workflows/v3-watchdog.yml"
@@ -23,7 +24,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: v3-scanner-watchdog
+  group: v3-scanner-watchdog-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
