@@ -1,0 +1,50 @@
+name: Research Backtest V2
+
+on:
+  push:
+    branches:
+      - freqtrade-migration
+    paths:
+      - "user_data/strategies/MarketOpportunityStrategy.py"
+      - "user_data/config-backtest.json"
+      - ".github/workflows/research-backtest.yml"
+  workflow_dispatch:
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Freqtrade stable
+        run: docker compose pull
+
+      - name: Download 180d research data
+        run: |
+          set -euo pipefail
+          docker compose run --rm freqtrade download-data \
+            --config /freqtrade/user_data/config-backtest.json \
+            --timeframes 15m 1h 4h \
+            --days 180 2>&1 | tee /tmp/download.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/download.log; then exit 1; fi
+
+      - name: Run 180d research backtest
+        run: |
+          set -euo pipefail
+          mkdir -p user_data/backtest_results
+          docker compose run --rm freqtrade backtesting \
+            --config /freqtrade/user_data/config-backtest.json \
+            --strategy MarketOpportunityStrategy \
+            --export trades \
+            --export-filename /freqtrade/user_data/backtest_results/research-v2.json \
+            2>&1 | tee user_data/backtest_results/research-v2.log
+          if grep -Eq "CRITICAL|ERROR -" user_data/backtest_results/research-v2.log; then exit 1; fi
+
+      - name: Upload research results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-backtest-v2
+          path: user_data/backtest_results/
+          if-no-files-found: error
