@@ -13,6 +13,7 @@ on:
     branches:
       - v3.4-free-redundancy
       - v3.4-external-watchdog
+      - v3.4.5-state-branch
       - main
     paths:
       - ".github/workflows/v3-watchdog.yml"
@@ -65,7 +66,7 @@ jobs:
             RUN_AGE=$((NOW - RUN_EPOCH))
           fi
 
-          HEARTBEAT_JSON=$(gh api             -H "Accept: application/vnd.github.raw+json"             "/repos/$GITHUB_REPOSITORY/contents/user_data/v3_state/scan_state.json?ref=main"             2>/dev/null || echo '{}')
+          HEARTBEAT_JSON=$(gh api             -H "Accept: application/vnd.github.raw+json"             "/repos/$GITHUB_REPOSITORY/contents/user_data/v3_state/scan_state.json?ref=v3-state"             2>/dev/null || echo '{}')
 
           HEARTBEAT_AT=$(echo "$HEARTBEAT_JSON" | jq -r '.last_completed_at // empty' 2>/dev/null || true)
           HEARTBEAT_AGE=999999
@@ -74,7 +75,7 @@ jobs:
             HEARTBEAT_AGE=$((NOW - HEARTBEAT_EPOCH))
           fi
 
-          DELIVERY_JSON=$(gh api             -H "Accept: application/vnd.github.raw+json"             "/repos/$GITHUB_REPOSITORY/contents/user_data/v3_state/delivery.json?ref=main"             2>/dev/null || echo '{"items":{}}')
+          DELIVERY_JSON=$(gh api             -H "Accept: application/vnd.github.raw+json"             "/repos/$GITHUB_REPOSITORY/contents/user_data/v3_state/delivery.json?ref=v3-state"             2>/dev/null || echo '{"items":{}}')
 
           PENDING_COUNT=$(echo "$DELIVERY_JSON" | jq '[.items[]? | select(.status != "SENT")] | length')
           OLDEST_PENDING=$(echo "$DELIVERY_JSON" | jq -r             '[.items[]? | select(.status != "SENT") | .created_at] | sort | .[0] // empty')
