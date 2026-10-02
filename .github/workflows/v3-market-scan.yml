@@ -1,4 +1,4 @@
-name: V3 Market Opportunity Scan
+name: V3.1 Market Opportunity Scan
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       send_telegram:
-        description: "Send Top-N snapshot to Telegram"
+        description: "Send unique setup/outcome alerts to Telegram"
         required: true
         type: boolean
         default: false
@@ -24,7 +24,7 @@ on:
         default: "10"
   push:
     branches:
-      - freqtrade-migration
+      - v3.1-outcome-tracker
       - main
     paths:
       - "user_data/v3/**"
@@ -32,7 +32,7 @@ on:
       - ".github/workflows/v3-market-scan.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: v3-market-opportunity-scan
@@ -44,42 +44,72 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Pull Freqtrade stable
         run: docker compose pull
 
-      - name: V3 self-test
+      - name: V3 ranker self-test
         run: |
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/market_ranker.py --self-test
 
-      - name: Prepare V3 output directory
+      - name: V3.1 outcome self-test
         run: |
-          mkdir -p user_data/v3_output
-          chmod 0777 user_data/v3_output
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/outcome_tracker.py --self-test
+
+      - name: Prepare runtime directories
+        run: |
+          mkdir -p user_data/v3_output user_data/v3_state
+          chmod 0777 user_data/v3_output user_data/v3_state
 
       - name: Scan Gate market and rank Top-N
         shell: bash
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          EVENT_NAME: ${{ github.event_name }}
-          MANUAL_SEND: ${{ inputs.send_telegram }}
           INPUT_UNIVERSE: ${{ inputs.universe }}
           INPUT_DEEP: ${{ inputs.deep_limit }}
           INPUT_TOP_N: ${{ inputs.top_n }}
         run: |
           set -euo pipefail
-
           UNIVERSE="${INPUT_UNIVERSE:-150}"
           DEEP="${INPUT_DEEP:-80}"
           TOP_N="${INPUT_TOP_N:-10}"
 
-          ARGS=(
-            --universe "$UNIVERSE"
-            --deep-limit "$DEEP"
-            --top-n "$TOP_N"
+          docker compose run --rm \
+            --entrypoint python \
+            freqtrade \
+            /freqtrade/user_data/v3/market_ranker.py \
+            --universe "$UNIVERSE" \
+            --deep-limit "$DEEP" \
+            --top-n "$TOP_N" \
             --output-dir /freqtrade/user_data/v3_output
+
+      - name: CI-test outcome integration
+        if: github.event_name == 'push'
+        run: |
+          docker compose run --rm \
+            --entrypoint python \
+            freqtrade \
+            /freqtrade/user_data/v3/outcome_tracker.py \
+            --snapshot /freqtrade/user_data/v3_output/latest.json \
+            --state /freqtrade/user_data/v3_output/ci-outcomes.json \
+            --summary /freqtrade/user_data/v3_output/ci-outcome-summary.json
+
+      - name: Track unique setups and outcomes
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MANUAL_SEND: ${{ inputs.send_telegram }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          ARGS=(
+            --snapshot /freqtrade/user_data/v3_output/latest.json
+            --state /freqtrade/user_data/v3_state/outcomes.json
+            --summary /freqtrade/user_data/v3_state/outcome_summary.json
           )
 
           if [[ "$EVENT_NAME" == "schedule" || "$MANUAL_SEND" == "true" ]]; then
@@ -91,9 +121,9 @@ jobs:
             -e TELEGRAM_BOT_TOKEN \
             -e TELEGRAM_CHAT_ID \
             freqtrade \
-            /freqtrade/user_data/v3/market_ranker.py "${ARGS[@]}"
+            /freqtrade/user_data/v3/outcome_tracker.py "${ARGS[@]}"
 
-      - name: Add report to job summary
+      - name: Add reports to job summary
         if: always()
         run: |
           if [ -f user_data/v3_output/latest.md ]; then
@@ -102,11 +132,37 @@ jobs:
             echo "V3 snapshot was not produced." >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Upload V3 snapshot
+          if [ -f user_data/v3_state/outcome_summary.json ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.1 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
+            cat user_data/v3_state/outcome_summary.json >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Persist V3.1 outcome state
+        if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add user_data/v3_state/outcomes.json user_data/v3_state/outcome_summary.json
+
+          if git diff --cached --quiet; then
+            echo "No outcome-state changes to persist."
+            exit 0
+          fi
+
+          git commit -m "Update V3.1 outcome state [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Upload V3.1 artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: v3-market-opportunity-snapshot
-          path: user_data/v3_output/
+          path: |
+            user_data/v3_output/
+            user_data/v3_state/outcome_summary.json
           if-no-files-found: warn
           retention-days: 14
