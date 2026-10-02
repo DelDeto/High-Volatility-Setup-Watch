@@ -49,7 +49,7 @@ jobs:
 
       - name: V3 self-test
         run: |
-          docker compose run --rm --entrypoint python freqtrade \\
+          docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/market_ranker.py --self-test
 
       - name: Scan Gate market and rank Top-N
@@ -80,12 +80,12 @@ jobs:
             ARGS+=(--telegram)
           fi
 
-          docker compose run --rm \\
-            --entrypoint python \\
-            -e TELEGRAM_BOT_TOKEN \\
-            -e TELEGRAM_CHAT_ID \\
-            freqtrade \\
-            /freqtrade/user_data/v3/market_ranker.py "\${ARGS[@]}"
+          docker compose run --rm \
+            --entrypoint python \
+            -e TELEGRAM_BOT_TOKEN \
+            -e TELEGRAM_CHAT_ID \
+            freqtrade \
+            /freqtrade/user_data/v3/market_ranker.py "${ARGS[@]}"
 
       - name: Add report to job summary
         if: always()
