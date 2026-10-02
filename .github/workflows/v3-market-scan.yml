@@ -1,0 +1,105 @@
+name: V3 Market Opportunity Scan
+
+on:
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+    inputs:
+      send_telegram:
+        description: "Send Top-N snapshot to Telegram"
+        required: true
+        type: boolean
+        default: false
+      universe:
+        description: "Liquid Gate pairs for fast scan"
+        required: true
+        default: "150"
+      deep_limit:
+        description: "Pairs for 15m/1h/4h deep scan"
+        required: true
+        default: "80"
+      top_n:
+        description: "Ranked opportunities to keep"
+        required: true
+        default: "10"
+  push:
+    branches:
+      - freqtrade-migration
+    paths:
+      - "user_data/v3/**"
+      - "user_data/strategies/MarketOpportunityStrategy.py"
+      - ".github/workflows/v3-market-scan.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v3-market-opportunity-scan
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Freqtrade stable
+        run: docker compose pull
+
+      - name: V3 self-test
+        run: |
+          docker compose run --rm freqtrade \
+            python /freqtrade/user_data/v3/market_ranker.py --self-test
+
+      - name: Scan Gate market and rank Top-N
+        shell: bash
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_SEND: ${{ inputs.send_telegram }}
+          INPUT_UNIVERSE: ${{ inputs.universe }}
+          INPUT_DEEP: ${{ inputs.deep_limit }}
+          INPUT_TOP_N: ${{ inputs.top_n }}
+        run: |
+          set -euo pipefail
+
+          UNIVERSE="${INPUT_UNIVERSE:-150}"
+          DEEP="${INPUT_DEEP:-80}"
+          TOP_N="${INPUT_TOP_N:-10}"
+
+          ARGS=(
+            --universe "$UNIVERSE"
+            --deep-limit "$DEEP"
+            --top-n "$TOP_N"
+            --output-dir /freqtrade/user_data/v3_output
+          )
+
+          if [[ "$EVENT_NAME" == "schedule" || "$MANUAL_SEND" == "true" ]]; then
+            ARGS+=(--telegram)
+          fi
+
+          docker compose run --rm \
+            -e TELEGRAM_BOT_TOKEN \
+            -e TELEGRAM_CHAT_ID \
+            freqtrade \
+            python /freqtrade/user_data/v3/market_ranker.py "${ARGS[@]}"
+
+      - name: Add report to job summary
+        if: always()
+        run: |
+          if [ -f user_data/v3_output/latest.md ]; then
+            cat user_data/v3_output/latest.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "V3 snapshot was not produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload V3 snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-market-opportunity-snapshot
+          path: user_data/v3_output/
+          if-no-files-found: warn
+          retention-days: 14
