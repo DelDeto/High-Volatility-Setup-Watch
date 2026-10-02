@@ -538,6 +538,52 @@ def obstacle_bucket(record: dict[str, Any]) -> str:
     return ">=1.50R"
 
 
+def score_bucket(record: dict[str, Any]) -> str:
+    raw = record.get("score")
+    if raw is None:
+        raw = record.get("latest_score")
+    if raw is None:
+        return "unknown"
+    value = int(finite(raw))
+    if value < 85:
+        return "<85"
+    if value < 90:
+        return "85-89"
+    if value < 95:
+        return "90-94"
+    return ">=95"
+
+
+def rr_bucket(record: dict[str, Any]) -> str:
+    raw = record.get("rr")
+    if raw is None:
+        raw = record.get("latest_rr")
+    if raw is None:
+        return "unknown"
+    value = finite(raw)
+    if value < 2.5:
+        return "<2.5R"
+    if value < 3.0:
+        return "2.5-2.99R"
+    if value < 4.0:
+        return "3.0-3.99R"
+    return ">=4.0R"
+
+
+def entry_distance_bucket(record: dict[str, Any]) -> str:
+    raw = record.get("entry_distance_atr")
+    if raw is None:
+        return "unknown"
+    value = finite(raw)
+    if value < 0.15:
+        return "<0.15 ATR"
+    if value < 0.35:
+        return "0.15-0.34 ATR"
+    if value < 0.60:
+        return "0.35-0.59 ATR"
+    return ">=0.60 ATR"
+
+
 def build_summary(state: dict[str, Any]) -> dict[str, Any]:
     records = state.get("records", [])
     counts = defaultdict(int)
@@ -578,6 +624,9 @@ def build_summary(state: dict[str, Any]) -> dict[str, Any]:
         ),
         "by_atr_expansion": group_stats(records, atr_expansion_bucket),
         "by_obstacle_clearance": group_stats(records, obstacle_bucket),
+        "by_score": group_stats(records, score_bucket),
+        "by_rr": group_stats(records, rr_bucket),
+        "by_entry_distance": group_stats(records, entry_distance_bucket),
     }
 
 
