@@ -150,6 +150,9 @@ def freeze_plan(record: dict[str, Any], item: dict[str, Any], now: datetime) -> 
     record["volatility_regime"] = item.get("volatility_regime")
     record["range_24h_pct"] = finite(item.get("range_24h_pct"))
     record["entry_distance_atr"] = finite(item.get("entry_distance_atr"))
+    record["atr_expansion"] = finite(item.get("atr_expansion"), 1.0)
+    record["obstacle_clearance_r"] = finite(item.get("obstacle_clearance_r"), 0.0)
+    record["quality_gates"] = item.get("quality_gates", "PASS")
     record["opportunity_value"] = finite(item.get("opportunity_value"))
     record["rank_at_ready"] = item.get("rank")
     risk = abs(record["entry"] - record["stop"])
@@ -187,6 +190,8 @@ def create_record(item: dict[str, Any], now: datetime) -> dict[str, Any]:
         "latest_score": int(item.get("score", 0)),
         "latest_rr": finite(item.get("rr")),
         "latest_opportunity_value": finite(item.get("opportunity_value")),
+        "latest_atr_expansion": finite(item.get("atr_expansion"), 1.0),
+        "latest_obstacle_clearance_r": finite(item.get("obstacle_clearance_r"), 0.0),
         "ready_at": None,
         "entry": None,
         "stop": None,
@@ -199,6 +204,9 @@ def create_record(item: dict[str, Any], now: datetime) -> dict[str, Any]:
         "volatility_regime": item.get("volatility_regime"),
         "range_24h_pct": finite(item.get("range_24h_pct")),
         "entry_distance_atr": finite(item.get("entry_distance_atr")),
+        "atr_expansion": None,
+        "obstacle_clearance_r": None,
+        "quality_gates": item.get("quality_gates", "PASS"),
         "opportunity_value": finite(item.get("opportunity_value")),
         "rank_at_ready": None,
         "plan_valid": None,
@@ -241,6 +249,8 @@ def update_seen_record(
         ("latest_score", int(item.get("score", 0))),
         ("latest_rr", finite(item.get("rr"))),
         ("latest_opportunity_value", finite(item.get("opportunity_value"))),
+        ("latest_atr_expansion", finite(item.get("atr_expansion"), 1.0)),
+        ("latest_obstacle_clearance_r", finite(item.get("obstacle_clearance_r"), 0.0)),
     ):
         if record.get(key) != value:
             record[key] = value
@@ -496,6 +506,84 @@ def group_stats(records: list[dict[str, Any]], key_fn) -> dict[str, Any]:
     return out
 
 
+def atr_expansion_bucket(record: dict[str, Any]) -> str:
+    raw = record.get("atr_expansion")
+    if raw is None:
+        raw = record.get("latest_atr_expansion")
+    if raw is None:
+        return "unknown"
+    value = finite(raw)
+    if value < 0.90:
+        return "<0.90x"
+    if value < 1.05:
+        return "0.90-1.04x"
+    if value < 1.25:
+        return "1.05-1.24x"
+    return ">=1.25x"
+
+
+def obstacle_bucket(record: dict[str, Any]) -> str:
+    raw = record.get("obstacle_clearance_r")
+    if raw is None:
+        raw = record.get("latest_obstacle_clearance_r")
+    if raw is None:
+        return "unknown"
+    value = finite(raw)
+    if value < 0.75:
+        return "<0.75R"
+    if value < 1.00:
+        return "0.75-0.99R"
+    if value < 1.50:
+        return "1.00-1.49R"
+    return ">=1.50R"
+
+
+def score_bucket(record: dict[str, Any]) -> str:
+    raw = record.get("score")
+    if raw is None:
+        raw = record.get("latest_score")
+    if raw is None:
+        return "unknown"
+    value = int(finite(raw))
+    if value < 85:
+        return "<85"
+    if value < 90:
+        return "85-89"
+    if value < 95:
+        return "90-94"
+    return ">=95"
+
+
+def rr_bucket(record: dict[str, Any]) -> str:
+    raw = record.get("rr")
+    if raw is None:
+        raw = record.get("latest_rr")
+    if raw is None:
+        return "unknown"
+    value = finite(raw)
+    if value < 2.5:
+        return "<2.5R"
+    if value < 3.0:
+        return "2.5-2.99R"
+    if value < 4.0:
+        return "3.0-3.99R"
+    return ">=4.0R"
+
+
+def entry_distance_bucket(record: dict[str, Any]) -> str:
+    raw = record.get("entry_distance_atr")
+    if raw is None:
+        return "unknown"
+    value = finite(raw)
+    if value < 0.15:
+        return "<0.15 ATR"
+    if value < 0.35:
+        return "0.15-0.34 ATR"
+    if value < 0.60:
+        return "0.35-0.59 ATR"
+    return ">=0.60 ATR"
+
+
 def build_summary(state: dict[str, Any]) -> dict[str, Any]:
     records = state.get("records", [])
     counts = defaultdict(int)
@@ -513,7 +601,7 @@ def build_summary(state: dict[str, Any]) -> dict[str, Any]:
     tp_sl = [r for r in records if r.get("tracking_status") in {"TP", "SL"}]
 
     return {
-        "version": "V3.4",
+        "version": "V3.5",
         "generated_at": iso(),
         "unique_setups": len(records),
         "ready_unique": sum(1 for r in records if r.get("ready_at")),
@@ -534,6 +622,11 @@ def build_summary(state: dict[str, Any]) -> dict[str, Any]:
         "by_volatility": group_stats(
             records, lambda r: r.get("volatility_regime", "unknown")
         ),
+        "by_atr_expansion": group_stats(records, atr_expansion_bucket),
+        "by_obstacle_clearance": group_stats(records, obstacle_bucket),
+        "by_score": group_stats(records, score_bucket),
+        "by_rr": group_stats(records, rr_bucket),
+        "by_entry_distance": group_stats(records, entry_distance_bucket),
     }
 
 
@@ -599,7 +692,7 @@ def ready_chart_caption(record: dict[str, Any], timeframe: str) -> str:
 def signal_alert(record: dict[str, Any], promoted: bool = False) -> str:
     label = "PROMOTED TO READY" if promoted else record.get("scanner_status", "NEW SETUP")
     lines = [
-        f"🚀 V3.4 {label}",
+        f"🚀 V3.5 {label}",
         f"{record['symbol']} {record['side']} | {record['setup']}",
     ]
     if record.get("tracking_status") == "PENDING_ENTRY":
@@ -615,7 +708,8 @@ def signal_alert(record: dict[str, Any], promoted: bool = False) -> str:
     else:
         lines.extend(
             [
-                f"Status DEVELOPING | Rank #{record.get('latest_rank')}",
+                f"Status DEVELOPING / WATCHLIST | Rank #{record.get('latest_rank')}",
+                "WATCHLIST ONLY — no entry/SL/TP until promoted to READY",
                 f"Latest RR {finite(record.get('latest_rr')):.2f}R | Score {record.get('latest_score')}",
                 f"ID {record['signal_id']}",
             ]
@@ -629,7 +723,7 @@ def outcome_alert(event: dict[str, Any]) -> str:
     if kind not in {"TP", "SL", "TIMEOUT", "AMBIGUOUS"}:
         return ""
     lines = [
-        f"📊 V3.4 OUTCOME {kind}",
+        f"📊 V3.5 OUTCOME {kind}",
         f"{record['symbol']} {record['side']} | {record['setup']}",
         f"ID {record['signal_id']}",
     ]
@@ -756,7 +850,7 @@ def run_tracker(args) -> dict[str, Any]:
     state = load_json(
         state_path,
         {
-            "version": "V3.4",
+            "version": "V3.5",
             "created_at": iso(now),
             "updated_at": iso(now),
             "records": [],
@@ -764,7 +858,7 @@ def run_tracker(args) -> dict[str, Any]:
     )
     delivery = load_delivery(delivery_path)
 
-    state["version"] = "V3.4"
+    state["version"] = "V3.5"
     exchange = build_exchange()
     outcome_events: list[dict[str, Any]] = []
 
@@ -881,8 +975,11 @@ def self_test() -> None:
         "range_24h_pct": 5.0,
         "entry_distance_atr": 0.2,
         "opportunity_value": 101.0,
+        "atr_expansion": 1.10,
+        "obstacle_clearance_r": 1.25,
+        "quality_gates": "PASS",
     }
-    state = {"version": "V3.4", "records": []}
+    state = {"version": "V3.5", "records": []}
     first = ingest_snapshot(state, {"top_opportunities": [ready]}, now, 12)
     assert len(first["new"]) == 1
     assert state["records"][0]["tracking_status"] == "PENDING_ENTRY"
@@ -931,7 +1028,7 @@ def self_test() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="V3.4 deterministic outcome tracker")
+    parser = argparse.ArgumentParser(description="V3.5 deterministic outcome tracker")
     parser.add_argument("--snapshot", default="/freqtrade/user_data/v3_output/latest.json")
     parser.add_argument("--state", default="/freqtrade/user_data/v3_state/outcomes.json")
     parser.add_argument("--summary", default="/freqtrade/user_data/v3_state/outcome_summary.json")

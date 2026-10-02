@@ -63,7 +63,7 @@ TOP 10
 Telegram + JSON/Markdown snapshot
 ```
 
-V3 is a selection/reporting layer over the V2 signal engine. The V2 rules are frozen in branch `v2-baseline` and also copied to `MarketOpportunityStrategyV2.py` for direct comparison.
+V3.5 is the active selection/reporting layer over the V2 structural engine. The V2 rules are frozen in branch `v2-baseline` and also copied to `MarketOpportunityStrategyV2.py` for direct comparison.
 
 ## Opportunity score
 
@@ -156,7 +156,7 @@ Every scan writes:
 
 - `user_data/v3_output/latest.json`: full machine-readable snapshot;
 - `user_data/v3_output/latest.md`: human-readable Top-N report;
-- Telegram: Top READY/DEVELOPING setups when Telegram secrets are configured.
+- Telegram: READY setups plus clearly labeled DEVELOPING watchlist items when Telegram secrets are configured.
 
 Each ranked setup includes:
 
@@ -418,6 +418,54 @@ External watchdog files:
 - `supabase/V34_SETUP.md`
 
 The external watchdog does not make trading decisions. When GitHub returns, the missed-slot catch-up mechanism reconstructs recent missed scans and the delivery ledger retries unsent alerts.
+
+## V3.5 Quality Calibration
+
+V3.5 was built after auditing the PONS legacy loss and A/B testing the first
+quality-gate proposal against the 90-day V2 baseline. The first experiment
+proved that globally vetoing nearby 15m obstacles / generic ATR contraction
+removed too many profitable trend pullbacks, so those cutoffs were **not**
+promoted to production entry rules.
+
+### Active V3.5 rules
+
+- **4H opposition veto:** a setup cannot become actionable while a fully
+  aligned 4H structure points in the opposite direction.
+- **High-vol continuation expansion:** `high_vol_continuation` requires 15m ATR
+  expansion >= **1.05x** its 96-candle median, in addition to breakout,
+  structure, volume and proximity conditions.
+- **Obstacle-to-target is telemetry, not a global veto:** the scanner records
+  the nearest prior 15m swing clearance in R, but does not reject ordinary
+  trend pullbacks solely because that swing is nearby.
+- **Generic ATR expansion is telemetry:** normal trend pullbacks are not
+  rejected solely because short-term ATR is contracting.
+
+### Telegram semantics
+
+`DEVELOPING` is explicitly rendered as **WATCHLIST ONLY**. Entry / SL / TP are
+shown only after a setup becomes `READY`. This directly prevents the PONS-type
+failure mode where a near-threshold setup can look like an executable trade.
+
+### Calibration telemetry
+
+Every ranked setup and frozen READY outcome stores:
+
+- `atr_expansion`
+- `obstacle_clearance_r`
+- `quality_gates`
+
+The outcome summary segments results by ATR-expansion, obstacle-clearance,
+score, RR and entry-distance buckets. These features can therefore be promoted
+into future entry gates only after forward/out-of-sample evidence supports a
+cutoff.
+
+### 90-day A/B safeguard
+
+The first V3.5 hard-gate experiment reduced the research sample from 85 to 30
+trades and degraded profit factor, so it was rejected. The revised calibration
+version restores the 85-trade sample while retaining the PONS safety/telemetry
+changes. This is intentionally conservative: V3.5 should not become "better"
+merely by deleting trades from the same calibration window.
 
 ## Quick start
 

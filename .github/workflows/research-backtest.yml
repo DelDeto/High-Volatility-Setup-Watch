@@ -1,12 +1,15 @@
-name: Research Backtest V2 - 90d
+name: Research Backtest V3.5 - 90d
 
 on:
   push:
     branches:
       - freqtrade-migration
+      - v3.5-quality-calibration
+      - main
     paths:
       - "user_data/strategies/MarketOpportunityStrategy.py"
       - "user_data/config-backtest.json"
+      - ".github/workflows/research-backtest.yml"
   workflow_dispatch:
 
 jobs:
@@ -28,7 +31,7 @@ jobs:
             --days 90 2>&1 | tee /tmp/download.log
           if grep -Eq "CRITICAL|ERROR -" /tmp/download.log; then exit 1; fi
 
-      - name: Run 90d research backtest
+      - name: Run V3.5 90d research backtest
         run: |
           set -euo pipefail
           mkdir -p artifacts
@@ -36,16 +39,16 @@ jobs:
             --config /freqtrade/user_data/config-backtest.json \
             --strategy MarketOpportunityStrategy \
             --export trades \
-            2>&1 | tee /tmp/research-v2.log
-          cp /tmp/research-v2.log artifacts/research-v2.log
-          if grep -Eq "CRITICAL|ERROR -" /tmp/research-v2.log; then exit 1; fi
+            2>&1 | tee /tmp/research-v35.log
+          cp /tmp/research-v35.log artifacts/research-v35.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/research-v35.log; then exit 1; fi
 
       - name: Upload research results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: research-backtest-v2
+          name: research-backtest-v35
           path: |
             user_data/backtest_results/
-            artifacts/research-v2.log
+            artifacts/research-v35.log
           if-no-files-found: error

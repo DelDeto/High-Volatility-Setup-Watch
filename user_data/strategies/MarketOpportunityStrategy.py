@@ -24,9 +24,10 @@ class MarketOpportunityStrategy(IStrategy):
     - Support both long and short futures signals.
     - Keep the first migration deterministic and easy to backtest.
 
-    V2 aligns the backtest risk model with the structural stop used to
-    calculate RR, and requires confirmation after liquidity sweeps instead
-    of entering on a naked sweep. It remains a dry-run/research strategy.
+    V3.5 keeps the structural risk model but moves fatal quality defects out
+    of the additive score. Opposing 4H structure, a nearby 15m obstacle, and
+    volatility contraction can now veto READY even when the raw score is high.
+    DEVELOPING remains watchlist-only research telemetry.
     """
 
     INTERFACE_VERSION = 3
@@ -109,6 +110,10 @@ class MarketOpportunityStrategy(IStrategy):
         dataframe["ema50"] = ta.EMA(dataframe, timeperiod=50)
         dataframe["atr"] = ta.ATR(dataframe, timeperiod=14)
         dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["atr_baseline96"] = dataframe["atr"].rolling(96, min_periods=48).median()
+        dataframe["atr_expansion"] = (
+            dataframe["atr"] / dataframe["atr_baseline96"].replace(0, np.nan)
+        )
 
         dataframe["volume_mean20"] = dataframe["volume"].rolling(20, min_periods=20).mean()
         dataframe["volume_ratio"] = dataframe["volume"] / dataframe["volume_mean20"].replace(0, np.nan)
@@ -276,6 +281,32 @@ class MarketOpportunityStrategy(IStrategy):
             np.nan,
         )
 
+        # V3.5 path-quality gate: the nearest 15m swing level between entry and
+        # the structural target is treated as an obstacle. READY needs at least
+        # 0.75R of clean space before that obstacle (or the target itself).
+        long_local_obstacle = np.where(
+            (dataframe["prior_high20"] > dataframe["close"])
+            & (dataframe["prior_high20"] < dataframe["long_target"]),
+            dataframe["prior_high20"],
+            dataframe["long_target"],
+        )
+        short_local_obstacle = np.where(
+            (dataframe["prior_low20"] < dataframe["close"])
+            & (dataframe["prior_low20"] > dataframe["short_target"]),
+            dataframe["prior_low20"],
+            dataframe["short_target"],
+        )
+        dataframe["long_obstacle_clearance_r"] = np.where(
+            long_risk > 0,
+            (long_local_obstacle - dataframe["close"]) / long_risk,
+            np.nan,
+        )
+        dataframe["short_obstacle_clearance_r"] = np.where(
+            short_risk > 0,
+            (dataframe["close"] - short_local_obstacle) / short_risk,
+            np.nan,
+        )
+
         long_location = (
             dataframe["long_entry_distance_atr"] <= dataframe["max_entry_distance_atr"]
         )
@@ -301,6 +332,7 @@ class MarketOpportunityStrategy(IStrategy):
         long_breakout_retest = (
             dataframe["recent_breakout_long"]
             & (dataframe["bull_structure_1h"] == 1)
+            & (dataframe["bear_structure_4h"] == 0)
             & (
                 (dataframe["close"] - dataframe["prior_high20"]).abs()
                 / atr_safe
@@ -312,6 +344,7 @@ class MarketOpportunityStrategy(IStrategy):
         short_breakout_retest = (
             dataframe["recent_breakout_short"]
             & (dataframe["bear_structure_1h"] == 1)
+            & (dataframe["bull_structure_4h"] == 0)
             & (
                 (dataframe["close"] - dataframe["prior_low20"]).abs()
                 / atr_safe
@@ -355,6 +388,8 @@ class MarketOpportunityStrategy(IStrategy):
         long_high_vol = (
             (dataframe["vol_regime"] >= 1)
             & (dataframe["bull_structure_1h"] == 1)
+            & (dataframe["bear_structure_4h"] == 0)
+            & (dataframe["atr_expansion"] >= 1.05)
             & dataframe["recent_breakout_long"]
             & (dataframe["close"] > dataframe["ema20"])
             & (dataframe["volume_ratio"] >= 1.40)
@@ -367,6 +402,8 @@ class MarketOpportunityStrategy(IStrategy):
         short_high_vol = (
             (dataframe["vol_regime"] >= 1)
             & (dataframe["bear_structure_1h"] == 1)
+            & (dataframe["bull_structure_4h"] == 0)
+            & (dataframe["atr_expansion"] >= 1.05)
             & dataframe["recent_breakout_short"]
             & (dataframe["close"] < dataframe["ema20"])
             & (dataframe["volume_ratio"] >= 1.40)
@@ -424,6 +461,12 @@ class MarketOpportunityStrategy(IStrategy):
         long_location_quality = long_location | long_pullback_location | long_breakout_retest
         short_location_quality = short_location | short_pullback_location | short_breakout_retest
 
+        # V3.5 calibration: opposing 4H structure remains a fatal defect for
+        # breakout/continuation paths. Obstacle clearance and generic ATR
+        # expansion stay as telemetry until outcome data proves a useful cutoff.
+        long_mtf_hard_gate = dataframe["bear_structure_4h"] == 0
+        short_mtf_hard_gate = dataframe["bull_structure_4h"] == 0
+
         dataframe["long_score"] = (
             20 * (dataframe["bull_structure_4h"] == 1).astype(int)
             + 10 * (dataframe["bull_structure_1h"] == 1).astype(int)
@@ -480,6 +523,7 @@ class MarketOpportunityStrategy(IStrategy):
             & (dataframe["long_score"] >= dataframe["long_required_score"])
             & (dataframe["long_rr"] >= dataframe["long_required_rr"])
             & long_location_quality
+            & long_mtf_hard_gate
         )
 
         dataframe["ready_short"] = (
@@ -487,6 +531,7 @@ class MarketOpportunityStrategy(IStrategy):
             & (dataframe["short_score"] >= dataframe["short_required_score"])
             & (dataframe["short_rr"] >= dataframe["short_required_rr"])
             & short_location_quality
+            & short_mtf_hard_gate
         )
 
         # Telemetry for the next calibration phase. These columns do not change
@@ -516,6 +561,7 @@ class MarketOpportunityStrategy(IStrategy):
             & (dataframe["long_score"] >= (dataframe["long_required_score"] - 8))
             & (dataframe["long_rr"] >= (dataframe["long_required_rr"] * 0.80))
             & long_location_quality
+            & long_mtf_hard_gate
         )
         dataframe["developing_short"] = (
             dataframe["short_setup"]
@@ -523,6 +569,7 @@ class MarketOpportunityStrategy(IStrategy):
             & (dataframe["short_score"] >= (dataframe["short_required_score"] - 8))
             & (dataframe["short_rr"] >= (dataframe["short_required_rr"] * 0.80))
             & short_location_quality
+            & short_mtf_hard_gate
         )
 
         return dataframe
@@ -545,6 +592,14 @@ class MarketOpportunityStrategy(IStrategy):
             + dataframe.loc[long_mask, "vol_regime"].astype(int).astype(str)
             + "_R"
             + (dataframe.loc[long_mask, "long_rr"] * 10).round().astype(int).astype(str)
+            + "_A"
+            + (dataframe.loc[long_mask, "atr_expansion"].fillna(0) * 100).round().astype(int).astype(str)
+            + "_O"
+            + (dataframe.loc[long_mask, "long_obstacle_clearance_r"].fillna(0).clip(0, 9.9) * 10).round().astype(int).astype(str)
+            + "_Q"
+            + dataframe.loc[long_mask, "rsi"].fillna(0).round().astype(int).astype(str)
+            + "_D"
+            + (dataframe.loc[long_mask, "long_rank_distance_atr"].fillna(0).clip(0, 9.9) * 10).round().astype(int).astype(str)
         )
         dataframe.loc[short_mask, "enter_tag"] = (
             "SHORT_"
@@ -555,6 +610,14 @@ class MarketOpportunityStrategy(IStrategy):
             + dataframe.loc[short_mask, "vol_regime"].astype(int).astype(str)
             + "_R"
             + (dataframe.loc[short_mask, "short_rr"] * 10).round().astype(int).astype(str)
+            + "_A"
+            + (dataframe.loc[short_mask, "atr_expansion"].fillna(0) * 100).round().astype(int).astype(str)
+            + "_O"
+            + (dataframe.loc[short_mask, "short_obstacle_clearance_r"].fillna(0).clip(0, 9.9) * 10).round().astype(int).astype(str)
+            + "_Q"
+            + dataframe.loc[short_mask, "rsi"].fillna(0).round().astype(int).astype(str)
+            + "_D"
+            + (dataframe.loc[short_mask, "short_rank_distance_atr"].fillna(0).clip(0, 9.9) * 10).round().astype(int).astype(str)
         )
         return dataframe
 

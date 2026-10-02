@@ -6,6 +6,7 @@ on:
     branches:
       - freqtrade-migration
       - main
+      - v3.5-quality-calibration
 
 jobs:
   validate:
@@ -35,6 +36,11 @@ jobs:
         run: |
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/market_ranker.py --self-test
+
+      - name: Validate V3.5 outcome tracker
+        run: |
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/outcome_tracker.py --self-test
 
       - name: Validate live Gate crypto pairlist
         run: |
