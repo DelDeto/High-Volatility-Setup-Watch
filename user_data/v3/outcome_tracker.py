@@ -17,6 +17,16 @@ from typing import Any
 import ccxt
 
 from chart_generator import generate_ready_charts, telegram_send_photo
+from delivery_ledger import (
+    enqueue,
+    load_delivery,
+    mark_attempt,
+    mark_failed,
+    mark_sent,
+    pending_items,
+    save_delivery,
+    stats as delivery_stats,
+)
 
 
 TERMINAL = {"TP", "SL", "TIMEOUT", "EXPIRED", "AMBIGUOUS"}
@@ -503,7 +513,7 @@ def build_summary(state: dict[str, Any]) -> dict[str, Any]:
     tp_sl = [r for r in records if r.get("tracking_status") in {"TP", "SL"}]
 
     return {
-        "version": "V3.2",
+        "version": "V3.4",
         "generated_at": iso(),
         "unique_setups": len(records),
         "ready_unique": sum(1 for r in records if r.get("ready_at")),
@@ -562,7 +572,9 @@ def ensure_ready_charts(
     record: dict[str, Any],
     chart_dir: Path,
 ) -> bool:
-    if record.get("tracking_status") not in {"PENDING_ENTRY", "ACTIVE", "TP", "SL", "TIMEOUT"}:
+    if record.get("tracking_status") not in {
+        "PENDING_ENTRY", "ACTIVE", "TP", "SL", "TIMEOUT", "AMBIGUOUS"
+    }:
         return False
     charts = record.get("charts") or {}
     existing = all(Path(p).exists() for p in charts.values()) if charts else False
@@ -587,7 +599,7 @@ def ready_chart_caption(record: dict[str, Any], timeframe: str) -> str:
 def signal_alert(record: dict[str, Any], promoted: bool = False) -> str:
     label = "PROMOTED TO READY" if promoted else record.get("scanner_status", "NEW SETUP")
     lines = [
-        f"🚀 V3.1 {label}",
+        f"🚀 V3.4 {label}",
         f"{record['symbol']} {record['side']} | {record['setup']}",
     ]
     if record.get("tracking_status") == "PENDING_ENTRY":
@@ -617,7 +629,7 @@ def outcome_alert(event: dict[str, Any]) -> str:
     if kind not in {"TP", "SL", "TIMEOUT", "AMBIGUOUS"}:
         return ""
     lines = [
-        f"📊 V3.1 OUTCOME {kind}",
+        f"📊 V3.4 OUTCOME {kind}",
         f"{record['symbol']} {record['side']} | {record['setup']}",
         f"ID {record['signal_id']}",
     ]
@@ -630,44 +642,154 @@ def outcome_alert(event: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def find_record(state: dict[str, Any], signal_id: str) -> dict[str, Any] | None:
+    return next(
+        (r for r in state.get("records", []) if r.get("signal_id") == signal_id),
+        None,
+    )
+
+
+def enqueue_notifications(
+    delivery: dict[str, Any],
+    ingest_events: dict[str, list[dict[str, Any]]],
+    outcome_events: list[dict[str, Any]],
+) -> None:
+    for record in ingest_events["new"]:
+        sid = record["signal_id"]
+        enqueue(
+            delivery,
+            key=f"signal:{sid}:new",
+            kind="signal_text",
+            signal_id=sid,
+            text=signal_alert(record, promoted=False),
+        )
+        if record.get("tracking_status") == "PENDING_ENTRY":
+            for tf in ("4h", "1h"):
+                enqueue(
+                    delivery,
+                    key=f"signal:{sid}:chart:{tf}",
+                    kind="signal_chart",
+                    signal_id=sid,
+                    timeframe=tf,
+                )
+
+    for record in ingest_events["promoted"]:
+        sid = record["signal_id"]
+        enqueue(
+            delivery,
+            key=f"signal:{sid}:ready",
+            kind="signal_text",
+            signal_id=sid,
+            text=signal_alert(record, promoted=True),
+        )
+        for tf in ("4h", "1h"):
+            enqueue(
+                delivery,
+                key=f"signal:{sid}:chart:{tf}",
+                kind="signal_chart",
+                signal_id=sid,
+                timeframe=tf,
+            )
+
+    for event in outcome_events:
+        message = outcome_alert(event)
+        if not message:
+            continue
+        record = event["record"]
+        sid = record["signal_id"]
+        kind = event["type"]
+        enqueue(
+            delivery,
+            key=f"outcome:{sid}:{kind}",
+            kind="outcome_text",
+            signal_id=sid,
+            text=message,
+        )
+
+
+def flush_deliveries(
+    delivery: dict[str, Any],
+    state: dict[str, Any],
+    exchange,
+    chart_dir: Path,
+) -> dict[str, int]:
+    sent = 0
+    failed = 0
+
+    for item in pending_items(delivery):
+        mark_attempt(item)
+        try:
+            if item.get("kind") == "signal_chart":
+                record = find_record(state, str(item.get("signal_id")))
+                if not record:
+                    raise RuntimeError("signal record not found for chart delivery")
+                ensure_ready_charts(exchange, record, chart_dir)
+                timeframe = str(item.get("timeframe"))
+                path = (record.get("charts") or {}).get(timeframe)
+                if not path:
+                    raise RuntimeError(f"chart path unavailable for {timeframe}")
+                ok = telegram_send_photo(
+                    path,
+                    ready_chart_caption(record, timeframe),
+                )
+            else:
+                ok = telegram_send(str(item.get("text") or ""))
+
+            if not ok:
+                raise RuntimeError("Telegram delivery returned false")
+            mark_sent(item)
+            sent += 1
+        except Exception as exc:  # noqa: BLE001
+            mark_failed(item, exc)
+            failed += 1
+
+    return {"sent": sent, "failed": failed}
+
+
 def run_tracker(args) -> dict[str, Any]:
-    now = utc_now()
+    observed_at = parse_dt(args.observed_at) if args.observed_at else None
+    now = observed_at or utc_now()
     snapshot = load_json(Path(args.snapshot), {"top_opportunities": []})
     state_path = Path(args.state)
     summary_path = Path(args.summary)
+    delivery_path = Path(args.delivery_state)
     state = load_json(
         state_path,
         {
-            "version": "V3.2",
+            "version": "V3.4",
             "created_at": iso(now),
             "updated_at": iso(now),
             "records": [],
         },
     )
+    delivery = load_delivery(delivery_path)
 
-    state["version"] = "V3.2"
+    state["version"] = "V3.4"
     exchange = build_exchange()
-    outcome_events = []
-    for record in state.get("records", []):
-        if record.get("tracking_status") in {"PENDING_ENTRY", "ACTIVE"}:
-            try:
-                outcome_events.extend(
-                    process_ready_record(
-                        record,
-                        exchange,
-                        now,
-                        args.entry_window_hours,
-                        args.max_hold_hours,
-                    )
-                )
-            except Exception as exc:  # noqa: BLE001
-                record.setdefault("notes", []).append(
-                    f"tracker_error:{type(exc).__name__}:{str(exc)[:160]}"
-                )
+    outcome_events: list[dict[str, Any]] = []
 
-    outcome_events.extend(
-        expire_stale_developing(state, now, args.developing_stale_hours)
-    )
+    if not args.ingest_only:
+        live_now = utc_now()
+        for record in state.get("records", []):
+            if record.get("tracking_status") in {"PENDING_ENTRY", "ACTIVE"}:
+                try:
+                    outcome_events.extend(
+                        process_ready_record(
+                            record,
+                            exchange,
+                            live_now,
+                            args.entry_window_hours,
+                            args.max_hold_hours,
+                        )
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    record.setdefault("notes", []).append(
+                        f"tracker_error:{type(exc).__name__}:{str(exc)[:160]}"
+                    )
+
+        outcome_events.extend(
+            expire_stale_developing(state, live_now, args.developing_stale_hours)
+        )
 
     ingest_events = ingest_snapshot(
         state, snapshot, now, args.cooldown_hours
@@ -684,11 +806,26 @@ def run_tracker(args) -> dict[str, Any]:
                     f"chart_error:{type(exc).__name__}:{str(exc)[:160]}"
                 )
 
-    state["updated_at"] = iso(now)
+    enqueue_notifications(delivery, ingest_events, outcome_events)
+
+    state["updated_at"] = iso(utc_now())
     summary = build_summary(state)
     save_json(state_path, state)
     save_json(summary_path, summary)
+    save_delivery(delivery_path, delivery)
 
+    send_result = {"sent": 0, "failed": 0}
+    if args.telegram:
+        send_result = flush_deliveries(
+            delivery,
+            state,
+            exchange,
+            Path(args.chart_dir),
+        )
+        save_json(state_path, state)
+        save_delivery(delivery_path, delivery)
+
+    d_stats = delivery_stats(delivery)
     print(
         "OUTCOME_TRACKER:",
         f"unique={summary['unique_setups']}",
@@ -697,6 +834,7 @@ def run_tracker(args) -> dict[str, Any]:
         f"tp={summary['tp']}",
         f"sl={summary['sl']}",
         f"ambiguous={summary['ambiguous']}",
+        f"ingest_only={args.ingest_only}",
     )
     print(
         "INGEST:",
@@ -704,27 +842,13 @@ def run_tracker(args) -> dict[str, Any]:
         f"promoted={len(ingest_events['promoted'])}",
         f"duplicate_suppressed={len(ingest_events['suppressed'])}",
     )
-
-    if args.telegram:
-        for record in ingest_events["new"]:
-            telegram_send(signal_alert(record, promoted=False))
-            if record.get("tracking_status") == "PENDING_ENTRY":
-                charts = record.get("charts") or {}
-                if charts.get("4h"):
-                    telegram_send_photo(charts["4h"], ready_chart_caption(record, "4h"))
-                if charts.get("1h"):
-                    telegram_send_photo(charts["1h"], ready_chart_caption(record, "1h"))
-        for record in ingest_events["promoted"]:
-            telegram_send(signal_alert(record, promoted=True))
-            charts = record.get("charts") or {}
-            if charts.get("4h"):
-                telegram_send_photo(charts["4h"], ready_chart_caption(record, "4h"))
-            if charts.get("1h"):
-                telegram_send_photo(charts["1h"], ready_chart_caption(record, "1h"))
-        for event in outcome_events:
-            message = outcome_alert(event)
-            if message:
-                telegram_send(message)
+    print(
+        "DELIVERY:",
+        f"pending={d_stats['pending']}",
+        f"sent_total={d_stats['sent']}",
+        f"sent_now={send_result['sent']}",
+        f"failed_now={send_result['failed']}",
+    )
 
     return {
         "summary": summary,
@@ -733,6 +857,8 @@ def run_tracker(args) -> dict[str, Any]:
         "suppressed": len(ingest_events["suppressed"]),
         "outcome_events": len(outcome_events),
         "charts_generated": len(chart_records),
+        "delivery": d_stats,
+        "delivery_attempt": send_result,
     }
 
 
@@ -756,7 +882,7 @@ def self_test() -> None:
         "entry_distance_atr": 0.2,
         "opportunity_value": 101.0,
     }
-    state = {"version": "V3.2", "records": []}
+    state = {"version": "V3.4", "records": []}
     first = ingest_snapshot(state, {"top_opportunities": [ready]}, now, 12)
     assert len(first["new"]) == 1
     assert state["records"][0]["tracking_status"] == "PENDING_ENTRY"
@@ -805,16 +931,29 @@ def self_test() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="V3.2 deterministic outcome tracker")
+    parser = argparse.ArgumentParser(description="V3.4 deterministic outcome tracker")
     parser.add_argument("--snapshot", default="/freqtrade/user_data/v3_output/latest.json")
     parser.add_argument("--state", default="/freqtrade/user_data/v3_state/outcomes.json")
     parser.add_argument("--summary", default="/freqtrade/user_data/v3_state/outcome_summary.json")
+    parser.add_argument(
+        "--delivery-state",
+        default="/freqtrade/user_data/v3_state/delivery.json",
+    )
     parser.add_argument("--chart-dir", default="/freqtrade/user_data/v3_charts")
     parser.add_argument("--entry-window-hours", type=int, default=6)
     parser.add_argument("--max-hold-hours", type=int, default=168)
     parser.add_argument("--developing-stale-hours", type=int, default=12)
     parser.add_argument("--cooldown-hours", type=int, default=12)
     parser.add_argument("--telegram", action="store_true")
+    parser.add_argument(
+        "--observed-at",
+        help="UTC ISO timestamp used for historical catch-up signal discovery",
+    )
+    parser.add_argument(
+        "--ingest-only",
+        action="store_true",
+        help="Ingest a historical snapshot without updating outcomes",
+    )
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
 
