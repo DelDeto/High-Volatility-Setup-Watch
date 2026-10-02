@@ -147,14 +147,14 @@ For reproducibility, `config-backtest.json` uses a static seed pairlist instead 
 ```bash
 docker compose run --rm freqtrade download-data \
   --config /freqtrade/user_data/config-backtest.json \
-  --timeframes 15m 1h 4h --days 180
+  --timeframes 15m 1h 4h --days 90
 
 docker compose run --rm freqtrade backtesting \
   --config /freqtrade/user_data/config-backtest.json \
   --strategy MarketOpportunityStrategy
 ```
 
-A manual GitHub Actions backtest workflow is included. The branch also contains `Research Backtest V2`, which runs a 180-day study on the static 20-pair research universe whenever the strategy or backtest config changes.
+A manual GitHub Actions backtest workflow is included. The branch also contains `Research Backtest V2 - 90d`, which runs a 90-day study on the static 20-pair research universe whenever the strategy or backtest config changes.
 
 ## Validation path
 
