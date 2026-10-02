@@ -15,6 +15,10 @@ on:
     paths:
       - ".github/workflows/v3-watchdog.yml"
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   watchdog:
     runs-on: ubuntu-latest
