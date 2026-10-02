@@ -1,5 +1,7 @@
 name: V3.4 Redundancy Watchdog
 
+# V3.4.2 external watchdog bootstrap
+
 on:
   schedule:
     - cron: "0,15,30,45 * * * *"
