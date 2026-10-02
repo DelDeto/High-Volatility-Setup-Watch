@@ -409,10 +409,6 @@ def analyze_symbol(
 
     long_mtf_hard_gate = not bear_4h
     short_mtf_hard_gate = not bull_4h
-    long_obstacle_gate = long_obstacle_clearance_r >= 0.75
-    short_obstacle_gate = short_obstacle_clearance_r >= 0.75
-    ready_expansion_gate = regime == 0 or atr_expansion >= 0.90
-    developing_expansion_gate = regime == 0 or atr_expansion >= 0.80
 
     long_score = (
         20 * int(bull_4h)
@@ -452,7 +448,6 @@ def analyze_symbol(
         location_quality: bool,
         distance: float,
         mtf_gate: bool,
-        obstacle_gate: bool,
         obstacle_clearance_r: float,
     ) -> None:
         if (
@@ -460,16 +455,11 @@ def analyze_symbol(
             or not math.isfinite(rr)
             or not location_quality
             or not mtf_gate
-            or not obstacle_gate
         ):
             return
-        if score >= req_score and rr >= req_rr and ready_expansion_gate:
+        if score >= req_score and rr >= req_rr:
             status = "READY"
-        elif (
-            score >= req_score - 8
-            and rr >= req_rr * 0.80
-            and developing_expansion_gate
-        ):
+        elif score >= req_score - 8 and rr >= req_rr * 0.80:
             status = "DEVELOPING"
         else:
             return
@@ -509,12 +499,12 @@ def analyze_symbol(
     build(
         "LONG", long_setup_name, long_score, long_req_score, long_rr, long_req_rr,
         long_stop, long_target, long_location_quality, min(long_entry_dist, long_pullback_dist),
-        long_mtf_hard_gate, long_obstacle_gate, long_obstacle_clearance_r,
+        long_mtf_hard_gate, long_obstacle_clearance_r,
     )
     build(
         "SHORT", short_setup_name, short_score, short_req_score, short_rr, short_req_rr,
         short_stop, short_target, short_location_quality, min(short_entry_dist, short_pullback_dist),
-        short_mtf_hard_gate, short_obstacle_gate, short_obstacle_clearance_r,
+        short_mtf_hard_gate, short_obstacle_clearance_r,
     )
     return opportunities
 
