@@ -25,9 +25,8 @@ on:
   push:
     branches:
       - v3.4-free-redundancy
-      - v3.4.1-supabase-activation
-      - v3.4.3-concurrency-isolation
-      - v3.4.4-production-queue
+      - v3.4-external-watchdog
+      - main
     paths:
       - "user_data/v3/**"
       - "user_data/strategies/MarketOpportunityStrategy.py"
@@ -38,8 +37,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: v3-market-opportunity-scan-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: v3-market-opportunity-scan-${{ github.ref }}-${{ github.event_name == 'push' && 'ci' || 'prod' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   scan:
@@ -309,7 +308,7 @@ jobs:
 
           OIDC_JSON=$(curl -fsSL \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=supabase-v34-heartbeat")
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=v34-supabase-watchdog")
           OIDC_TOKEN=$(echo "$OIDC_JSON" | jq -r '.value')
 
           SLOT=$(jq -r '.last_completed_slot // empty' user_data/v3_state/scan_state.json)
@@ -335,8 +334,8 @@ jobs:
             }')
 
           RESPONSE=$(curl -fsSL -X POST \
-            "https://kiyvdmhsztywyqfojomi.supabase.co/functions/v1/scanner-heartbeat" \
-            -H "Authorization: Bearer $OIDC_TOKEN" \
+            "https://uvifyvqomwcorhbjudho.supabase.co/functions/v1/scanner-watchdog" \
+            -H "x-github-oidc: $OIDC_TOKEN" \
             -H "Content-Type: application/json" \
             --data "$PAYLOAD")
 
