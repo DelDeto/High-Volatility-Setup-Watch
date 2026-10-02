@@ -1,0 +1,1 @@
+[functions.scanner-watchdog]\nverify_jwt = false\n
