@@ -1,9 +1,11 @@
 {
-  "version": "V3.1",
-  "generated_at": null,
-  "unique_setups": 0,
+  "version": "V3.2",
+  "generated_at": "2026-10-02T08:40:24.232119+00:00",
+  "unique_setups": 2,
   "ready_unique": 0,
-  "tracking_counts": {},
+  "tracking_counts": {
+    "MONITORING": 2
+  },
   "completed_trade_outcomes": 0,
   "tp": 0,
   "sl": 0,
@@ -13,7 +15,37 @@
   "win_rate_tp_sl": null,
   "average_r": null,
   "profit_factor_r": null,
-  "by_setup": {},
-  "by_side": {},
-  "by_volatility": {}
+  "by_setup": {
+    "trend_pullback": {
+      "records": 2,
+      "completed": 0,
+      "wins_tp": 0,
+      "losses_sl": 0,
+      "win_rate_tp_sl": null,
+      "average_r": null,
+      "profit_factor_r": null
+    }
+  },
+  "by_side": {
+    "LONG": {
+      "records": 2,
+      "completed": 0,
+      "wins_tp": 0,
+      "losses_sl": 0,
+      "win_rate_tp_sl": null,
+      "average_r": null,
+      "profit_factor_r": null
+    }
+  },
+  "by_volatility": {
+    "HIGH": {
+      "records": 2,
+      "completed": 0,
+      "wins_tp": 0,
+      "losses_sl": 0,
+      "win_rate_tp_sl": null,
+      "average_r": null,
+      "profit_factor_r": null
+    }
+  }
 }
