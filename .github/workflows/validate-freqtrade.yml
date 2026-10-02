@@ -6,6 +6,7 @@ on:
     branches:
       - freqtrade-migration
       - main
+      - v3.5-quality-calibration
 
 jobs:
   validate:
