@@ -25,6 +25,7 @@ on:
   push:
     branches:
       - v3.4-free-redundancy
+      - v3.4.1-supabase-activation
       - main
     paths:
       - "user_data/v3/**"
@@ -33,6 +34,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 concurrency:
   group: v3-market-opportunity-scan
@@ -296,20 +298,49 @@ jobs:
             --event "$EVENT_NAME" \
             --catchup-count "$MISSED_COUNT"
 
-      - name: Sync external Supabase heartbeat
+      - name: Sync external Supabase heartbeat via GitHub OIDC
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
-          SUPABASE_PROJECT_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          docker compose run --rm \
-            --entrypoint python \
-            -e SUPABASE_PROJECT_URL \
-            -e SUPABASE_SECRET_KEY \
-            freqtrade \
-            /freqtrade/user_data/v3/supabase_heartbeat.py \
-            --scan-state /freqtrade/user_data/v3_state/scan_state.json \
-            --delivery-state /freqtrade/user_data/v3_state/delivery.json
+          set -euo pipefail
+
+          OIDC_JSON=$(curl -fsSL \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=supabase-v34-heartbeat")
+          OIDC_TOKEN=$(echo "$OIDC_JSON" | jq -r '.value')
+
+          SLOT=$(jq -r '.last_completed_slot // empty' user_data/v3_state/scan_state.json)
+          COMPLETED_AT=$(jq -r '.last_completed_at // empty' user_data/v3_state/scan_state.json)
+          RUN_ID=$(jq -r '.last_run_id // empty' user_data/v3_state/scan_state.json)
+          PENDING=$(jq '[.items[]? | select(.status != "SENT")] | length' user_data/v3_state/delivery.json)
+
+          PAYLOAD=$(jq -n \
+            --arg slot "$SLOT" \
+            --arg completed "$COMPLETED_AT" \
+            --arg run "$RUN_ID" \
+            --arg bot "$TELEGRAM_BOT_TOKEN" \
+            --arg chat "$TELEGRAM_CHAT_ID" \
+            --argjson pending "$PENDING" \
+            '{
+              last_completed_slot: (if $slot == "" then null else $slot end),
+              last_completed_at: (if $completed == "" then null else $completed end),
+              run_id: $run,
+              status: "healthy",
+              pending_delivery: $pending,
+              telegram_bot_token: $bot,
+              telegram_chat_id: $chat
+            }')
+
+          RESPONSE=$(curl -fsSL -X POST \
+            "https://kiyvdmhsztywyqfojomi.supabase.co/functions/v1/scanner-heartbeat" \
+            -H "Authorization: Bearer $OIDC_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "$PAYLOAD")
+
+          echo "$RESPONSE" | jq -e '.ok == true' >/dev/null
+          echo "V34_SUPABASE_HEARTBEAT_OK slot=$SLOT pending=$PENDING"
 
       - name: Add reports to job summary
         if: always()
