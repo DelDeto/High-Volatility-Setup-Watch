@@ -6,10 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       force_recovery:
-        description: "Force a recovery scan even if the primary scanner is healthy"
-        required: true
-        type: boolean
-        default: false
+        description: "Force a recovery scan"
+        required: false
+        default: "false"
   push:
     branches:
       - v3.3-watchdog
@@ -29,179 +28,136 @@ jobs:
   watchdog:
     runs-on: ubuntu-latest
     timeout-minutes: 12
-    env:
-      GH_TOKEN: ${{ github.token }}
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      PRIMARY_WORKFLOW: v3-market-scan.yml
-      STALE_SECONDS: "1200"
     steps:
-      - name: Inspect primary scanner health
-        id: health
+      - name: Check health and recover if needed
         shell: bash
         env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref }}
           FORCE_INPUT: ${{ inputs.force_recovery }}
+          PRIMARY_WORKFLOW: v3-market-scan.yml
+          STALE_SECONDS: "1200"
         run: |
           set -euo pipefail
 
           NOW=$(date +%s)
           FORCE="false"
 
-          # A push to main only happens when this watchdog is deployed/changed.
-          # Use it as a one-time end-to-end recovery test.
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+          if [[ "$EVENT_NAME" == "push" && "$REF_NAME" == "refs/heads/main" ]]; then
             FORCE="true"
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "$FORCE_INPUT" == "true" ]]; then
+          fi
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "${FORCE_INPUT:-false}" == "true" ]]; then
             FORCE="true"
           fi
 
-          RUNS=$(gh api             -H "Accept: application/vnd.github+json"             "/repos/${GITHUB_REPOSITORY}/actions/workflows/${PRIMARY_WORKFLOW}/runs?per_page=30")
+          RUNS=$(gh api -H "Accept: application/vnd.github+json"             "/repos/$GITHUB_REPOSITORY/actions/workflows/$PRIMARY_WORKFLOW/runs?per_page=30")
 
           LATEST=$(echo "$RUNS" | jq -c '
             [.workflow_runs[]
              | select(.event == "schedule" or .event == "workflow_dispatch")]
-            | sort_by(.created_at)
-            | reverse
-            | .[0] // null
+            | sort_by(.created_at) | reverse | .[0] // null
           ')
 
           if [[ "$LATEST" == "null" ]]; then
             AGE=999999
             STATUS="missing"
             CONCLUSION="none"
-            LAST_URL=""
-            LAST_CREATED=""
           else
             LAST_CREATED=$(echo "$LATEST" | jq -r '.created_at')
             STATUS=$(echo "$LATEST" | jq -r '.status')
             CONCLUSION=$(echo "$LATEST" | jq -r '.conclusion // "none"')
-            LAST_URL=$(echo "$LATEST" | jq -r '.html_url')
             LAST_EPOCH=$(date -d "$LAST_CREATED" +%s)
             AGE=$((NOW - LAST_EPOCH))
           fi
-
-          echo "Latest production run: created=$LAST_CREATED status=$STATUS conclusion=$CONCLUSION age=${AGE}s"
-          echo "latest_url=$LAST_URL" >> "$GITHUB_OUTPUT"
-          echo "age_seconds=$AGE" >> "$GITHUB_OUTPUT"
 
           HEALTHY="false"
           if (( AGE <= STALE_SECONDS )); then
             if [[ "$STATUS" == "queued" || "$STATUS" == "in_progress" ]]; then
               HEALTHY="true"
-            elif [[ "$STATUS" == "completed" && "$CONCLUSION" == "success" ]]; then
+            fi
+            if [[ "$STATUS" == "completed" && "$CONCLUSION" == "success" ]]; then
               HEALTHY="true"
             fi
           fi
 
-          RECOVER="false"
-          REASON=""
-          if [[ "$FORCE" == "true" ]]; then
-            RECOVER="true"
-            REASON="forced_watchdog_test"
-          elif [[ "$HEALTHY" != "true" ]]; then
-            RECOVER="true"
-            if (( AGE > STALE_SECONDS )); then
-              REASON="scanner_stale_${AGE}s"
-            else
-              REASON="latest_production_run_${CONCLUSION}"
-            fi
+          echo "Watchdog health: age=${AGE}s status=$STATUS conclusion=$CONCLUSION healthy=$HEALTHY force=$FORCE"
+
+          # Branch pushes are syntax/logic tests only. Never touch production from a test branch.
+          if [[ "$REF_NAME" != "refs/heads/main" ]]; then
+            echo "Non-main branch: health-check only."
+            exit 0
           fi
 
-          echo "healthy=$HEALTHY" >> "$GITHUB_OUTPUT"
-          echo "recover=$RECOVER" >> "$GITHUB_OUTPUT"
-          echo "reason=$REASON" >> "$GITHUB_OUTPUT"
+          if [[ "$FORCE" != "true" && "$HEALTHY" == "true" ]]; then
+            echo "Primary scanner healthy; no recovery needed."
+            exit 0
+          fi
 
-      - name: Healthy heartbeat
-        if: steps.health.outputs.recover != 'true'
-        run: |
-          echo "Primary V3.2 scanner is healthy. No recovery needed."
+          REASON="stale_or_failed"
+          if [[ "$FORCE" == "true" ]]; then
+            REASON="forced_recovery_test"
+          fi
+          AGE_MIN=$((AGE / 60))
 
-      - name: Send watchdog recovery alert
-        if: steps.health.outputs.recover == 'true' && github.ref == 'refs/heads/main'
-        shell: bash
-        run: |
-          set -euo pipefail
-          AGE_MIN=$(( ${{ steps.health.outputs.age_seconds }} / 60 ))
-          TEXT="⚠️ V3.3 WATCHDOG
-
-Primary scanner needs recovery.
-Reason: ${{ steps.health.outputs.reason }}
+          ALERT="⚠️ V3.3 WATCHDOG
+Primary scanner recovery triggered.
+Reason: $REASON
 Last production scan age: ${AGE_MIN} min
+Starting replacement V3.2 scan now."
 
-Watchdog is starting a replacement V3.2 scan now."
+          curl -fsS -X POST             "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"             --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"             --data-urlencode "text=$ALERT" >/dev/null
 
-          RESPONSE=$(curl -sS -X POST             "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"             --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"             --data-urlencode "text=$TEXT")
-
-          echo "$RESPONSE" | jq -e '.ok == true' >/dev/null
-
-      - name: Dispatch replacement production scan
-        id: dispatch
-        if: steps.health.outputs.recover == 'true' && github.ref == 'refs/heads/main'
-        shell: bash
-        run: |
-          set -euo pipefail
           START_EPOCH=$(date +%s)
-          echo "start_epoch=$START_EPOCH" >> "$GITHUB_OUTPUT"
 
           gh workflow run "$PRIMARY_WORKFLOW"             --repo "$GITHUB_REPOSITORY"             --ref main             -f send_telegram=true             -f universe=150             -f deep_limit=80             -f top_n=10
 
-          echo "Recovery workflow_dispatch submitted."
-
-      - name: Verify recovery completed
-        if: steps.health.outputs.recover == 'true' && github.ref == 'refs/heads/main'
-        shell: bash
-        run: |
-          set -euo pipefail
-          START_EPOCH=${{ steps.dispatch.outputs.start_epoch }}
           DEADLINE=$(( $(date +%s) + 540 ))
-          RECOVERY_ID=""
 
           while (( $(date +%s) < DEADLINE )); do
-            RUNS=$(gh api               -H "Accept: application/vnd.github+json"               "/repos/${GITHUB_REPOSITORY}/actions/workflows/${PRIMARY_WORKFLOW}/runs?per_page=20")
+            sleep 20
 
-            CANDIDATE=$(echo "$RUNS" | jq -c --argjson start "$START_EPOCH" '
+            CHECK=$(gh api -H "Accept: application/vnd.github+json"               "/repos/$GITHUB_REPOSITORY/actions/workflows/$PRIMARY_WORKFLOW/runs?per_page=20")
+
+            CANDIDATE=$(echo "$CHECK" | jq -c --argjson start "$START_EPOCH" '
               [.workflow_runs[]
                | select(.event == "workflow_dispatch")
                | . + {epoch: (.created_at | fromdateiso8601)}
                | select(.epoch >= ($start - 10))]
-              | sort_by(.epoch)
-              | reverse
-              | .[0] // null
+              | sort_by(.epoch) | reverse | .[0] // null
             ')
 
-            if [[ "$CANDIDATE" != "null" ]]; then
-              RECOVERY_ID=$(echo "$CANDIDATE" | jq -r '.id')
-              STATUS=$(echo "$CANDIDATE" | jq -r '.status')
-              CONCLUSION=$(echo "$CANDIDATE" | jq -r '.conclusion // "none"')
-              URL=$(echo "$CANDIDATE" | jq -r '.html_url')
-              echo "Recovery run $RECOVERY_ID: status=$STATUS conclusion=$CONCLUSION"
-
-              if [[ "$STATUS" == "completed" ]]; then
-                if [[ "$CONCLUSION" == "success" ]]; then
-                  TEXT="✅ V3.3 WATCHDOG RECOVERED
-
-Replacement market scan completed successfully.
-The normal 15-minute monitoring cycle is restored."
-                  curl -sS -X POST                     "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"                     --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"                     --data-urlencode "text=$TEXT" | jq -e '.ok == true' >/dev/null
-                  exit 0
-                fi
-
-                TEXT="🚨 V3.3 WATCHDOG RECOVERY FAILED
-
-Replacement scan finished with: $CONCLUSION
-Immediate manual inspection is required.
-$URL"
-                curl -sS -X POST                   "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"                   --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"                   --data-urlencode "text=$TEXT" | jq -e '.ok == true' >/dev/null
-                exit 1
-              fi
+            if [[ "$CANDIDATE" == "null" ]]; then
+              continue
             fi
 
-            sleep 20
+            STATUS=$(echo "$CANDIDATE" | jq -r '.status')
+            CONCLUSION=$(echo "$CANDIDATE" | jq -r '.conclusion // "none"')
+            RUN_URL=$(echo "$CANDIDATE" | jq -r '.html_url')
+            echo "Recovery status=$STATUS conclusion=$CONCLUSION"
+
+            if [[ "$STATUS" != "completed" ]]; then
+              continue
+            fi
+
+            if [[ "$CONCLUSION" == "success" ]]; then
+              OK="✅ V3.3 WATCHDOG RECOVERED
+Replacement scan completed successfully.
+Normal monitoring is restored."
+              curl -fsS -X POST                 "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"                 --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"                 --data-urlencode "text=$OK" >/dev/null
+              exit 0
+            fi
+
+            FAIL="🚨 V3.3 WATCHDOG RECOVERY FAILED
+Replacement scan conclusion: $CONCLUSION
+$RUN_URL"
+            curl -fsS -X POST               "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"               --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"               --data-urlencode "text=$FAIL" >/dev/null
+            exit 1
           done
 
-          TEXT="🚨 V3.3 WATCHDOG TIMEOUT
-
-A replacement scan was dispatched but did not complete within the watchdog window.
-Please inspect GitHub Actions."
-          curl -sS -X POST             "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"             --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"             --data-urlencode "text=$TEXT" | jq -e '.ok == true' >/dev/null
+          TIMEOUT="🚨 V3.3 WATCHDOG TIMEOUT
+Recovery was dispatched but did not finish within 9 minutes."
+          curl -fsS -X POST             "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"             --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"             --data-urlencode "text=$TIMEOUT" >/dev/null
           exit 1
