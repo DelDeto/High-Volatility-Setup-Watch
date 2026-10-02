@@ -36,31 +36,34 @@ The old MEXC implementation is preserved in branch `legacy-high-vol-v1`.
 ```text
 Gate USDT perpetual futures
         ↓
-All active USDT perpetual markets
+All active USDT perpetual crypto markets
         ↓
-Remove stocks / indices / commodities / forex / metals
+Top 150 by quote volume
         ↓
-VolumePairList → top 150 liquid crypto pairs
+FAST SCAN: 1H on all 150
         ↓
-Spread filter
+Top 40 liquidity guaranteed
++ highest setup-potential pairs
         ↓
-15M base strategy
-   + 1H context
-   + 4H regime
+DEEP SCAN: 80 pairs
+15M + 1H + 4H
         ↓
-Trend pullback
-Breakout/retest
-Sweep reversal
-High-vol continuation
+V2 setup engine
+Trend pullback / Breakout-retest
+Sweep reversal / High-vol continuation
         ↓
 Structural Entry / SL / TP
         ↓
-RR + Opportunity Score
+READY / DEVELOPING
         ↓
-READY signals
+Cross-market Opportunity Value
         ↓
-Freqtrade dry-run / backtest / Telegram
+TOP 10
+        ↓
+Telegram + JSON/Markdown snapshot
 ```
+
+V3 is a selection/reporting layer over the V2 signal engine. The V2 rules are frozen in branch `v2-baseline` and also copied to `MarketOpportunityStrategyV2.py` for direct comparison.
 
 ## Opportunity score
 
@@ -105,6 +108,77 @@ A pair may qualify through any one of these paths. RR is calculated only after s
 
 This fixes the main V1 mismatch where RR was calculated against a structural stop but the backtest was still using a fixed 8% emergency stop.
 
+
+## V3 cross-market ranking
+
+V3 does **not** change the V2 entry rules yet. It ranks the outputs across the market so a high score on one pair is compared against every other candidate at the same scan.
+
+For each side:
+
+```text
+opportunity_value
+= score
++ 4 × min(RR, 5)
+- 5 × min(entry_distance_ATR, 2)
+```
+
+Ranking priority is:
+
+1. `READY` before `DEVELOPING`;
+2. higher `opportunity_value`;
+3. higher RR;
+4. higher setup score;
+5. better liquidity rank.
+
+`DEVELOPING` means the setup exists and is near the V2 gate, but is not yet allowed to become an entry:
+
+- score can be at most 8 points below the required score;
+- RR must be at least 80% of the regime-specific required RR;
+- location quality must already be valid.
+
+If both LONG and SHORT qualify on the same symbol, V3 suppresses the pair when the two directions are too close in opportunity value. If one direction is clearly stronger, only that side is kept.
+
+### Two-stage universe
+
+To keep GitHub Actions practical without reducing the market to only a handful of coins:
+
+- all eligible Gate USDT perpetuals are discovered;
+- top 150 by quote volume enter the fast 1H scan;
+- top 40 by liquidity are always retained for deep scan;
+- the rest of the 80-pair deep scan is filled by 1H setup-potential ranking;
+- 15m + 1H + 4H analysis is then applied to those 80 pairs.
+
+This keeps broad-market discovery while controlling API load.
+
+### V3 outputs
+
+Every scan writes:
+
+- `user_data/v3_output/latest.json`: full machine-readable snapshot;
+- `user_data/v3_output/latest.md`: human-readable Top-N report;
+- Telegram: Top READY/DEVELOPING setups when Telegram secrets are configured.
+
+Each ranked setup includes:
+
+```text
+rank
+coin
+LONG / SHORT
+READY / DEVELOPING
+setup type
+entry
+structural SL
+structural TP
+RR
+score
+volatility regime
+24H range
+entry distance in ATR
+opportunity value
+```
+
+No real orders are placed by the V3 scanner.
+
 ## Quick start
 
 Requirements: Docker + Docker Compose.
@@ -121,7 +195,14 @@ docker compose run --rm freqtrade list-strategies \
 docker compose run --rm freqtrade test-pairlist \
   --config /freqtrade/user_data/config.json
 
-# Start continuous dry-run
+# Test the V3 ranking logic without network access
+docker compose run --rm freqtrade python /freqtrade/user_data/v3/market_ranker.py --self-test
+
+# Run a live V3 snapshot without Telegram
+docker compose run --rm freqtrade python /freqtrade/user_data/v3/market_ranker.py \
+  --universe 150 --deep-limit 80 --top-n 10
+
+# Start continuous Freqtrade V2 dry-run
 docker compose up -d
 
 # Follow logs
@@ -130,7 +211,9 @@ docker compose logs -f
 
 ## Telegram
 
-Freqtrade supports environment-variable overrides. In `.env`:
+The scheduled V3 GitHub Action uses repository secrets `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`. It sends a message only when at least one READY/DEVELOPING opportunity exists.
+
+Freqtrade itself also supports environment-variable overrides. In `.env`:
 
 ```bash
 FREQTRADE__TELEGRAM__ENABLED=true
@@ -158,15 +241,14 @@ A manual GitHub Actions backtest workflow is included. The branch also contains 
 
 ## Validation path
 
-1. strategy/config validation;
-2. live Gate crypto pairlist smoke test;
-3. historical data download;
-4. backtest;
-5. lookahead analysis;
-6. continuous dry-run;
-7. collect 50–100 closed setups;
-8. calibrate score and RR thresholds;
-9. only then consider live execution.
+1. V2 baseline frozen;
+2. V3 ranker self-test in CI;
+3. scheduled Gate Top-150 → Top-80 → Top-10 snapshot;
+4. compare READY/DEVELOPING forward outcomes;
+5. collect at least 100–200 ranked setups;
+6. calibrate by setup × side × volatility regime × RR bucket × entry distance;
+7. run out-of-sample / walk-forward checks;
+8. only then consider changing entry rules or enabling live execution.
 
 ## Upstream
 
