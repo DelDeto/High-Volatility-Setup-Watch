@@ -145,11 +145,11 @@ jobs:
 
           if [ -f user_data/v3_state/outcome_summary.json ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## V3.1 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.2 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
             cat user_data/v3_state/outcome_summary.json >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Persist V3.1 outcome state
+      - name: Persist V3.2 outcome state
         if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
@@ -163,11 +163,11 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Update V3.1 outcome state [skip ci]"
+          git commit -m "Update V3.2 outcome state [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
 
-      - name: Upload V3.1 artifacts
+      - name: Upload V3.2 artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
