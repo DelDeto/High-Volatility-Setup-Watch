@@ -257,8 +257,10 @@ Persistent files:
 
 - `user_data/v3_state/outcomes.json`
 - `user_data/v3_state/outcome_summary.json`
+- `user_data/v3_state/delivery.json`
+- `user_data/v3_state/scan_state.json`
 
-Scheduled runs persist state back to `main` using a `[skip ci]` commit so the 15-minute workflow does not create a CI loop.
+Production runs restore and persist these runtime files on the dedicated `v3-state` branch. Keeping mutable state off `main` prevents code merges, reruns from older SHAs, and state commits from creating rebase conflicts. The `v3-state` branch is not a scanner trigger.
 
 ### Telegram deduplication
 
@@ -398,8 +400,8 @@ This prevents a transient Telegram failure from becoming a permanently missed al
 The V3.4 watchdog checks three independent health indicators:
 
 - recent production workflow status;
-- committed scanner heartbeat age;
-- age of the oldest pending Telegram delivery.
+- scanner heartbeat age from the dedicated `v3-state` branch;
+- age of the oldest pending Telegram delivery from `v3-state`.
 
 If state is stale it dispatches a replacement production scan. That replacement runs the same catch-up planner and flushes pending Telegram notifications.
 
