@@ -352,6 +352,71 @@ This layer also distinguishes CI/push runs from real production runs: only `sche
 
 The watchdog cannot make GitHub's infrastructure mathematically infallible. If GitHub Actions itself is unavailable for both workflows, neither can run. Within GitHub Actions, however, V3.3 converts a single missed primary cron from silent failure into an automatically detected and retried event, with Telegram visibility.
 
+
+## V3.4 Free Redundancy
+
+V3.4 adds reliability without changing the trading strategy.
+
+### 1. Missed-slot catch-up
+
+Every successful production cycle writes a canonical 15-minute heartbeat slot. Before the next production scan the workflow compares the current slot with the last completed slot.
+
+If one or more slots were missed:
+
+```text
+last completed: 09:00
+current slot:   09:45
+        ↓
+catch-up 09:15
+catch-up 09:30
+        ↓
+normal 09:45 scan
+```
+
+Catch-up scans use the historical closed-candle cutoff (`--as-of`) rather than current candles, so a recovered signal is reconstructed from the information that existed at that missed slot. Up to 8 missed slots (2 hours) are replayed automatically. Older missed slots are explicitly reported as truncated rather than silently treated as recovered.
+
+### 2. Durable Telegram delivery
+
+Telegram notifications now use a persistent at-least-once delivery ledger:
+
+```text
+event detected
+   ↓
+PENDING saved to delivery.json
+   ↓
+Telegram send
+   ├─ confirmed → SENT
+   └─ timeout/error → remains PENDING
+                         ↓
+                    next cycle retries
+```
+
+This prevents a transient Telegram failure from becoming a permanently missed alert after signal deduplication. A process crash can theoretically cause a duplicate alert if Telegram accepted the message immediately before state persistence; V3.4 intentionally prefers a rare duplicate over silently missing a signal.
+
+### 3. Stronger GitHub watchdog
+
+The V3.4 watchdog checks three independent health indicators:
+
+- recent production workflow status;
+- committed scanner heartbeat age;
+- age of the oldest pending Telegram delivery.
+
+If state is stale it dispatches a replacement production scan. That replacement runs the same catch-up planner and flushes pending Telegram notifications.
+
+### 4. Independent Supabase watchdog
+
+GitHub also syncs each successful heartbeat to Supabase when the repository secrets `SUPABASE_PROJECT_URL` and `SUPABASE_SECRET_KEY` are configured.
+
+Supabase Cron can invoke `supabase/functions/scanner-watchdog` every 10 minutes. Because this schedule runs outside GitHub Actions, it can notify Telegram when GitHub itself stops scheduling both the primary scanner and its GitHub-hosted watchdog.
+
+External watchdog files:
+
+- `supabase/migrations/202610020001_v34_watchdog.sql`
+- `supabase/functions/scanner-watchdog/index.ts`
+- `supabase/V34_SETUP.md`
+
+The external watchdog does not make trading decisions. When GitHub returns, the missed-slot catch-up mechanism reconstructs recent missed scans and the delivery ledger retries unsent alerts.
+
 ## Quick start
 
 Requirements: Docker + Docker Compose.
