@@ -50,6 +50,23 @@ jobs:
       - name: Pull Freqtrade stable
         run: docker compose pull
 
+      - name: Restore chart dependency cache
+        id: chart-cache
+        uses: actions/cache@v4
+        with:
+          path: user_data/.chartdeps
+          key: v3-chartdeps-matplotlib-v1
+
+      - name: Install chart dependency
+        if: steps.chart-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p user_data/.chartdeps
+          chmod 0777 user_data/.chartdeps
+          docker compose run --rm --entrypoint python freqtrade \
+            -m pip install --no-cache-dir \
+            --target /freqtrade/user_data/.chartdeps \
+            matplotlib
+
       - name: V3 ranker self-test
         run: |
           docker compose run --rm --entrypoint python freqtrade \
