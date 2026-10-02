@@ -25,6 +25,7 @@ on:
   push:
     branches:
       - v3.2-visual-signal-pack
+      - v3.3.1-state-permissions
       - main
     paths:
       - "user_data/v3/**"
@@ -90,6 +91,9 @@ jobs:
         run: |
           mkdir -p user_data/v3_output user_data/v3_state user_data/v3_charts
           chmod 0777 user_data/v3_output user_data/v3_state user_data/v3_charts
+          chmod 0666 user_data/v3_state/outcomes.json user_data/v3_state/outcome_summary.json
+          test -w user_data/v3_state/outcomes.json
+          test -w user_data/v3_state/outcome_summary.json
 
       - name: Scan Gate market and rank Top-N
         shell: bash
@@ -120,8 +124,8 @@ jobs:
             freqtrade \
             /freqtrade/user_data/v3/outcome_tracker.py \
             --snapshot /freqtrade/user_data/v3_output/latest.json \
-            --state /freqtrade/user_data/v3_output/ci-outcomes.json \
-            --summary /freqtrade/user_data/v3_output/ci-outcome-summary.json \
+            --state /freqtrade/user_data/v3_state/outcomes.json \
+            --summary /freqtrade/user_data/v3_state/outcome_summary.json \
             --chart-dir /freqtrade/user_data/v3_charts
 
       - name: Track unique setups and outcomes
