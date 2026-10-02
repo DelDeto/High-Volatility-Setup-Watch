@@ -309,6 +309,49 @@ Charts are not committed into Git history. They are uploaded with the workflow a
 
 This visual layer is descriptive only. It does not approve, reject or modify a trade signal.
 
+
+## V3.3 Self-healing Watchdog
+
+V3.3 adds a second automation layer whose only job is to make the production scanner recover from missed or failed GitHub schedules.
+
+Primary scanner:
+
+```text
+:07 / :22 / :37 / :52
+        ↓
+V3.2 market scan
+        ↓
+Outcome Tracker
+        ↓
+Telegram
+```
+
+Watchdog:
+
+```text
+:00 / :15 / :30 / :45
+        ↓
+Inspect latest production schedule/workflow_dispatch run
+        ↓
+Healthy and <=20 min old?
+   YES → do nothing
+   NO  → Telegram watchdog alert
+          ↓
+        workflow_dispatch replacement V3.2 scan
+          ↓
+        verify completion for up to 9 minutes
+          ↓
+        Telegram RECOVERED / FAILED / TIMEOUT
+```
+
+A queued or in-progress production scan younger than 20 minutes is treated as healthy, so a merely delayed GitHub runner is not unnecessarily duplicated.
+
+The watchdog is deliberately staggered from the primary scanner. If one expected 15-minute primary trigger is missed, the next watchdog check can detect that the most recent production run has become stale and start a replacement scan.
+
+This layer also distinguishes CI/push runs from real production runs: only `schedule` and `workflow_dispatch` runs count as scanner heartbeat.
+
+The watchdog cannot make GitHub's infrastructure mathematically infallible. If GitHub Actions itself is unavailable for both workflows, neither can run. Within GitHub Actions, however, V3.3 converts a single missed primary cron from silent failure into an automatically detected and retried event, with Telegram visibility.
+
 ## Quick start
 
 Requirements: Docker + Docker Compose.

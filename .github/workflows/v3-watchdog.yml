@@ -1,0 +1,162 @@
+name: V3.3 Scanner Watchdog
+
+on:
+  schedule:
+    - cron: "0,15,30,45 * * * *"
+  workflow_dispatch:
+    inputs:
+      force_recovery:
+        description: "Force a recovery scan"
+        required: false
+        default: "false"
+  push:
+    branches:
+      - v3.3-watchdog
+      - main
+    paths:
+      - ".github/workflows/v3-watchdog.yml"
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Inspect primary scanner health
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref }}
+          FORCE_INPUT: ${{ inputs.force_recovery }}
+          PRIMARY_WORKFLOW: v3-market-scan.yml
+          STALE_SECONDS: "1200"
+        run: |
+          set -euo pipefail
+          NOW=$(date +%s)
+
+          RUNS=$(gh api -H "Accept: application/vnd.github+json" "/repos/$GITHUB_REPOSITORY/actions/workflows/$PRIMARY_WORKFLOW/runs?per_page=30")
+          LATEST=$(echo "$RUNS" | jq -c '[.workflow_runs[] | select(.event == "schedule" or .event == "workflow_dispatch")] | sort_by(.created_at) | reverse | .[0] // null')
+
+          if [[ "$LATEST" == "null" ]]; then
+            AGE=999999
+            STATUS="missing"
+            CONCLUSION="none"
+          else
+            LAST_CREATED=$(echo "$LATEST" | jq -r '.created_at')
+            STATUS=$(echo "$LATEST" | jq -r '.status')
+            CONCLUSION=$(echo "$LATEST" | jq -r '.conclusion // "none"')
+            LAST_EPOCH=$(date -d "$LAST_CREATED" +%s)
+            AGE=$((NOW - LAST_EPOCH))
+          fi
+
+          HEALTHY="false"
+          if (( AGE <= STALE_SECONDS )); then
+            if [[ "$STATUS" == "queued" || "$STATUS" == "in_progress" ]]; then
+              HEALTHY="true"
+            elif [[ "$STATUS" == "completed" && "$CONCLUSION" == "success" ]]; then
+              HEALTHY="true"
+            fi
+          fi
+
+          echo "WATCHDOG_HEALTH age_seconds=$AGE status=$STATUS conclusion=$CONCLUSION healthy=$HEALTHY"
+
+          if [[ "$REF_NAME" != "refs/heads/main" ]]; then
+            echo "Branch test only; no production recovery."
+            exit 0
+          fi
+
+          FORCE="false"
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            FORCE="true"
+          elif [[ "$EVENT_NAME" == "workflow_dispatch" && "${FORCE_INPUT:-false}" == "true" ]]; then
+            FORCE="true"
+          fi
+
+          if [[ "$FORCE" != "true" && "$HEALTHY" == "true" ]]; then
+            echo "Primary scanner healthy."
+            exit 0
+          fi
+
+          echo "WATCHDOG_RECOVERY_REQUIRED age_seconds=$AGE"
+
+          AGE_MIN=$((AGE / 60))
+          ALERT=$(printf '%s\n' \
+            "⚠️ V3.3 WATCHDOG" \
+            "Primary scanner recovery triggered." \
+            "Last production scan age: ${AGE_MIN} min" \
+            "Starting replacement V3.2 scan now.")
+
+          curl -fsS -X POST \
+            "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+            --data-urlencode "text=$ALERT" >/dev/null
+
+          START_EPOCH=$(date +%s)
+
+          gh workflow run "$PRIMARY_WORKFLOW" \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main \
+            -f send_telegram=true \
+            -f universe=150 \
+            -f deep_limit=80 \
+            -f top_n=10
+
+          echo "WATCHDOG_DISPATCHED"
+
+          DEADLINE=$(( $(date +%s) + 540 ))
+          while (( $(date +%s) < DEADLINE )); do
+            sleep 20
+
+            CHECK=$(gh api -H "Accept: application/vnd.github+json" "/repos/$GITHUB_REPOSITORY/actions/workflows/$PRIMARY_WORKFLOW/runs?per_page=20")
+            CANDIDATE=$(echo "$CHECK" | jq -c --argjson start "$START_EPOCH" '[.workflow_runs[] | select(.event == "workflow_dispatch") | . + {epoch: (.created_at | fromdateiso8601)} | select(.epoch >= ($start - 10))] | sort_by(.epoch) | reverse | .[0] // null')
+
+            if [[ "$CANDIDATE" == "null" ]]; then
+              continue
+            fi
+
+            RECOVERY_STATUS=$(echo "$CANDIDATE" | jq -r '.status')
+            RECOVERY_CONCLUSION=$(echo "$CANDIDATE" | jq -r '.conclusion // "none"')
+            RECOVERY_URL=$(echo "$CANDIDATE" | jq -r '.html_url')
+            echo "WATCHDOG_RECOVERY status=$RECOVERY_STATUS conclusion=$RECOVERY_CONCLUSION"
+
+            if [[ "$RECOVERY_STATUS" != "completed" ]]; then
+              continue
+            fi
+
+            if [[ "$RECOVERY_CONCLUSION" == "success" ]]; then
+              OK=$(printf '%s\n' \
+                "✅ V3.3 WATCHDOG RECOVERED" \
+                "Replacement market scan completed successfully." \
+                "Normal 15-minute monitoring is restored.")
+              curl -fsS -X POST \
+                "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+                --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+                --data-urlencode "text=$OK" >/dev/null
+              exit 0
+            fi
+
+            FAIL=$(printf '%s\n' \
+              "🚨 V3.3 WATCHDOG RECOVERY FAILED" \
+              "Replacement scan conclusion: $RECOVERY_CONCLUSION" \
+              "$RECOVERY_URL")
+            curl -fsS -X POST \
+              "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+              --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+              --data-urlencode "text=$FAIL" >/dev/null
+            exit 1
+          done
+
+          TIMEOUT=$(printf '%s\n' \
+            "🚨 V3.3 WATCHDOG TIMEOUT" \
+            "Recovery was dispatched but did not finish within 9 minutes.")
+          curl -fsS -X POST \
+            "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+            --data-urlencode "text=$TIMEOUT" >/dev/null
+          exit 1
