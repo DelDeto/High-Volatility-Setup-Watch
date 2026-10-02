@@ -63,7 +63,7 @@ TOP 10
 Telegram + JSON/Markdown snapshot
 ```
 
-V3 is a selection/reporting layer over the V2 signal engine. The V2 rules are frozen in branch `v2-baseline` and also copied to `MarketOpportunityStrategyV2.py` for direct comparison.
+V3.5 is the active selection/reporting layer over the V2 structural engine. The V2 rules are frozen in branch `v2-baseline` and also copied to `MarketOpportunityStrategyV2.py` for direct comparison.
 
 ## Opportunity score
 
@@ -156,7 +156,7 @@ Every scan writes:
 
 - `user_data/v3_output/latest.json`: full machine-readable snapshot;
 - `user_data/v3_output/latest.md`: human-readable Top-N report;
-- Telegram: Top READY/DEVELOPING setups when Telegram secrets are configured.
+- Telegram: READY setups plus clearly labeled DEVELOPING watchlist items when Telegram secrets are configured.
 
 Each ranked setup includes:
 
@@ -418,6 +418,45 @@ External watchdog files:
 - `supabase/V34_SETUP.md`
 
 The external watchdog does not make trading decisions. When GitHub returns, the missed-slot catch-up mechanism reconstructs recent missed scans and the delivery ledger retries unsent alerts.
+
+## V3.5 Quality Calibration
+
+V3.5 changes signal quality gates after reviewing the PONS legacy loss and the
+90-day V2 research distribution. It deliberately does **not** solve quality by
+blindly raising the score threshold.
+
+### Hard quality gates
+
+Fatal structural defects can no longer be compensated by additive score:
+
+- **4H opposition veto:** LONG cannot be READY inside a fully bearish 4H stack;
+  SHORT cannot be READY inside a fully bullish 4H stack.
+- **Obstacle-to-target gate:** the nearest prior 15m swing between entry and the
+  structural target must leave at least **0.75R** of clean space.
+- **Volatility expansion gate:** in HIGH / VERY_HIGH / EXTREME regimes, READY
+  requires 15m ATR expansion >= **0.90x** its 96-candle median.
+- **High-vol continuation:** requires ATR expansion >= **1.05x**, in addition to
+  the existing breakout, structure, volume and proximity conditions.
+- DEVELOPING may remain on the watchlist with ATR expansion >= **0.80x**, but it
+  is not an entry state.
+
+### Telegram semantics
+
+`DEVELOPING` is now explicitly rendered as **WATCHLIST ONLY**. Entry / SL / TP
+are shown only after a setup becomes `READY`. This prevents a near-threshold
+setup from looking like an executable recommendation.
+
+### Calibration telemetry
+
+Every ranked setup and frozen READY outcome now stores:
+
+- `atr_expansion`
+- `obstacle_clearance_r`
+- `quality_gates`
+
+The outcome summary also segments results by ATR-expansion bucket and
+obstacle-clearance bucket. This allows the next calibration step to adjust or
+remove gates from forward evidence rather than from one losing trade.
 
 ## Quick start
 
