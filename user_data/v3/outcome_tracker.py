@@ -513,7 +513,7 @@ def build_summary(state: dict[str, Any]) -> dict[str, Any]:
     tp_sl = [r for r in records if r.get("tracking_status") in {"TP", "SL"}]
 
     return {
-        "version": "V3.4",
+        "version": "V3.5",
         "generated_at": iso(),
         "unique_setups": len(records),
         "ready_unique": sum(1 for r in records if r.get("ready_at")),
@@ -599,7 +599,7 @@ def ready_chart_caption(record: dict[str, Any], timeframe: str) -> str:
 def signal_alert(record: dict[str, Any], promoted: bool = False) -> str:
     label = "PROMOTED TO READY" if promoted else record.get("scanner_status", "NEW SETUP")
     lines = [
-        f"🚀 V3.4 {label}",
+        f"🚀 V3.5 {label}",
         f"{record['symbol']} {record['side']} | {record['setup']}",
     ]
     if record.get("tracking_status") == "PENDING_ENTRY":
@@ -615,7 +615,8 @@ def signal_alert(record: dict[str, Any], promoted: bool = False) -> str:
     else:
         lines.extend(
             [
-                f"Status DEVELOPING | Rank #{record.get('latest_rank')}",
+                f"Status DEVELOPING / WATCHLIST | Rank #{record.get('latest_rank')}",
+                "WATCHLIST ONLY — no entry/SL/TP until promoted to READY",
                 f"Latest RR {finite(record.get('latest_rr')):.2f}R | Score {record.get('latest_score')}",
                 f"ID {record['signal_id']}",
             ]
@@ -629,7 +630,7 @@ def outcome_alert(event: dict[str, Any]) -> str:
     if kind not in {"TP", "SL", "TIMEOUT", "AMBIGUOUS"}:
         return ""
     lines = [
-        f"📊 V3.4 OUTCOME {kind}",
+        f"📊 V3.5 OUTCOME {kind}",
         f"{record['symbol']} {record['side']} | {record['setup']}",
         f"ID {record['signal_id']}",
     ]
@@ -756,7 +757,7 @@ def run_tracker(args) -> dict[str, Any]:
     state = load_json(
         state_path,
         {
-            "version": "V3.4",
+            "version": "V3.5",
             "created_at": iso(now),
             "updated_at": iso(now),
             "records": [],
@@ -764,7 +765,7 @@ def run_tracker(args) -> dict[str, Any]:
     )
     delivery = load_delivery(delivery_path)
 
-    state["version"] = "V3.4"
+    state["version"] = "V3.5"
     exchange = build_exchange()
     outcome_events: list[dict[str, Any]] = []
 
@@ -882,7 +883,7 @@ def self_test() -> None:
         "entry_distance_atr": 0.2,
         "opportunity_value": 101.0,
     }
-    state = {"version": "V3.4", "records": []}
+    state = {"version": "V3.5", "records": []}
     first = ingest_snapshot(state, {"top_opportunities": [ready]}, now, 12)
     assert len(first["new"]) == 1
     assert state["records"][0]["tracking_status"] == "PENDING_ENTRY"
@@ -931,7 +932,7 @@ def self_test() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="V3.4 deterministic outcome tracker")
+    parser = argparse.ArgumentParser(description="V3.5 deterministic outcome tracker")
     parser.add_argument("--snapshot", default="/freqtrade/user_data/v3_output/latest.json")
     parser.add_argument("--state", default="/freqtrade/user_data/v3_state/outcomes.json")
     parser.add_argument("--summary", default="/freqtrade/user_data/v3_state/outcome_summary.json")
