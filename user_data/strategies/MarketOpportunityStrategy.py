@@ -489,6 +489,42 @@ class MarketOpportunityStrategy(IStrategy):
             & short_location_quality
         )
 
+        # Telemetry for the next calibration phase. These columns do not change
+        # backtest entries; they prepare DEVELOPING states and cross-pair ranking.
+        dataframe["long_rank_distance_atr"] = np.minimum(
+            dataframe["long_entry_distance_atr"],
+            dataframe["long_pullback_distance_atr"],
+        )
+        dataframe["short_rank_distance_atr"] = np.minimum(
+            dataframe["short_entry_distance_atr"],
+            dataframe["short_pullback_distance_atr"],
+        )
+        dataframe["long_opportunity_value"] = (
+            dataframe["long_score"]
+            + (np.clip(dataframe["long_rr"], 0, 5) * 4)
+            - (np.clip(dataframe["long_rank_distance_atr"], 0, 2) * 5)
+        )
+        dataframe["short_opportunity_value"] = (
+            dataframe["short_score"]
+            + (np.clip(dataframe["short_rr"], 0, 5) * 4)
+            - (np.clip(dataframe["short_rank_distance_atr"], 0, 2) * 5)
+        )
+
+        dataframe["developing_long"] = (
+            dataframe["long_setup"]
+            & ~dataframe["ready_long"]
+            & (dataframe["long_score"] >= (dataframe["long_required_score"] - 8))
+            & (dataframe["long_rr"] >= (dataframe["long_required_rr"] * 0.80))
+            & long_location_quality
+        )
+        dataframe["developing_short"] = (
+            dataframe["short_setup"]
+            & ~dataframe["ready_short"]
+            & (dataframe["short_score"] >= (dataframe["short_required_score"] - 8))
+            & (dataframe["short_rr"] >= (dataframe["short_required_rr"] * 0.80))
+            & short_location_quality
+        )
+
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -498,17 +534,27 @@ class MarketOpportunityStrategy(IStrategy):
         dataframe.loc[long_mask, "enter_long"] = 1
         dataframe.loc[short_mask, "enter_short"] = 1
 
+        # Encode score, volatility regime and RR into the tag so research
+        # results can be segmented without changing entry rules.
         dataframe.loc[long_mask, "enter_tag"] = (
             "LONG_"
             + dataframe.loc[long_mask, "long_setup_name"].astype(str)
             + "_S"
             + dataframe.loc[long_mask, "long_score"].astype(int).astype(str)
+            + "_V"
+            + dataframe.loc[long_mask, "vol_regime"].astype(int).astype(str)
+            + "_R"
+            + (dataframe.loc[long_mask, "long_rr"] * 10).round().astype(int).astype(str)
         )
         dataframe.loc[short_mask, "enter_tag"] = (
             "SHORT_"
             + dataframe.loc[short_mask, "short_setup_name"].astype(str)
             + "_S"
             + dataframe.loc[short_mask, "short_score"].astype(int).astype(str)
+            + "_V"
+            + dataframe.loc[short_mask, "vol_regime"].astype(int).astype(str)
+            + "_R"
+            + (dataframe.loc[short_mask, "short_rr"] * 10).round().astype(int).astype(str)
         )
         return dataframe
 
