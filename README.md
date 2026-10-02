@@ -64,7 +64,7 @@ Freqtrade dry-run / backtest / Telegram
 
 ## Opportunity score
 
-The first migration version uses a 100-point framework:
+V2 uses the same 100-point framework, but setup confirmation is stricter and structural risk is now used by the actual Freqtrade stoploss:
 
 - 20: 4H structure
 - 10: 1H structure
@@ -91,6 +91,19 @@ Thresholds become stricter as volatility rises.
 - `high_vol_continuation`
 
 A pair may qualify through any one of these paths. RR is calculated only after structure, location and invalidation are defined.
+
+### V2 changes
+
+- naked liquidity sweeps no longer trigger reversal entries;
+- sweep reversal requires a recent sweep plus 15m micro-structure CHoCH;
+- reversals cannot directly fight a fully aligned opposing 4H trend;
+- short reversal requires a higher score and higher minimum RR than V1;
+- trend pullback can use either 1H demand/supply or the 1H EMA20 pullback location;
+- high-volatility continuation requires a recent breakout and retest proximity;
+- structural invalidation now includes a minimum 15m ATR noise buffer;
+- Freqtrade `custom_stoploss()` now uses the same structural stop model used by the RR engine.
+
+This fixes the main V1 mismatch where RR was calculated against a structural stop but the backtest was still using a fixed 8% emergency stop.
 
 ## Quick start
 
@@ -141,7 +154,7 @@ docker compose run --rm freqtrade backtesting \
   --strategy MarketOpportunityStrategy
 ```
 
-A manual GitHub Actions backtest workflow is included.
+A manual GitHub Actions backtest workflow is included. The branch also contains `Research Backtest V2`, which runs a 180-day study on the static 20-pair research universe whenever the strategy or backtest config changes.
 
 ## Validation path
 
