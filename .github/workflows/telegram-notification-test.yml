@@ -1,0 +1,98 @@
+name: One-off Telegram Notification Test
+
+on:
+  push:
+    branches:
+      - telegram-notification-test
+    paths:
+      - ".github/workflows/telegram-notification-test.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  telegram-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Freqtrade stable
+        run: docker compose pull
+
+      - name: Prepare output
+        run: |
+          mkdir -p user_data/v3_output
+          chmod 0777 user_data/v3_output
+
+      - name: Run live V3.2 market scan
+        run: |
+          docker compose run --rm \
+            --entrypoint python \
+            freqtrade \
+            /freqtrade/user_data/v3/market_ranker.py \
+            --universe 150 \
+            --deep-limit 80 \
+            --top-n 10 \
+            --output-dir /freqtrade/user_data/v3_output
+
+      - name: Build one test notification
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path("user_data/v3_output/latest.json").read_text())
+          top = data.get("top_opportunities", [])
+
+          lines = [
+              "🧪 V3.2 TELEGRAM TEST — KHÔNG PHẢI LỆNH TRADE",
+              "",
+              f"Gate scan: {data.get('universe_scanned', 0)} → deep {data.get('deep_scanned', 0)}",
+              f"READY: {data.get('ready_count', 0)} | DEVELOPING: {data.get('developing_count', 0)}",
+          ]
+
+          if top:
+              x = top[0]
+              lines += [
+                  "",
+                  f"Top hiện tại: #{x.get('rank')} {x.get('symbol')} {x.get('side')} — {x.get('status')}",
+                  f"Setup: {x.get('setup')}",
+                  f"Entry: {x.get('entry')}",
+                  f"SL: {x.get('stop')}",
+                  f"TP: {x.get('target')}",
+                  f"RR: {x.get('rr', 0):.2f}R | Score: {x.get('score')}",
+                  f"Volatility: {x.get('volatility_regime')}",
+              ]
+          else:
+              lines += [
+                  "",
+                  "Hiện tại chưa có setup READY/DEVELOPING đạt Top-N.",
+              ]
+
+          lines += [
+              "",
+              "✅ Kênh Telegram V3.2 đang hoạt động.",
+              "Signal READY thật sau này sẽ kèm chart 4H + 1H.",
+          ]
+
+          Path("/tmp/telegram_message.txt").write_text("\n".join(lines), encoding="utf-8")
+          print(Path("/tmp/telegram_message.txt").read_text())
+          PY
+
+      - name: Send exactly one Telegram test message
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$TELEGRAM_BOT_TOKEN"
+          test -n "$TELEGRAM_CHAT_ID"
+
+          RESPONSE=$(curl -sS -X POST \
+            "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+            --data-urlencode "text@/tmp/telegram_message.txt" \
+            --data-urlencode "disable_web_page_preview=true")
+
+          echo "$RESPONSE" | python -c 'import json,sys; d=json.load(sys.stdin); assert d.get("ok") is True, d; print("TELEGRAM_TEST_SENT_OK")'
