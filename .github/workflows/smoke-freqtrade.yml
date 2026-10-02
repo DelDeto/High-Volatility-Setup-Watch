@@ -38,5 +38,7 @@ jobs:
             --config /freqtrade/user_data/config-backtest.json \
             --strategy MarketOpportunityStrategy \
             --pairs BTC/USDT:USDT ETH/USDT:USDT SOL/USDT:USDT VVV/USDT:USDT USELESS/USDT:USDT \
-            --timerange "${START_DATE}-${END_DATE}" 2>&1 | tee /tmp/lookahead.log
-          if grep -Eq "CRITICAL|ERROR -" /tmp/lookahead.log; then exit 1; fi
+            --timerange "${START_DATE}-${END_DATE}" \
+            --minimum-trade-amount 5 \
+            --targeted-trade-amount 5 2>&1 | tee /tmp/lookahead.log
+          if grep -Eq "CRITICAL|ERROR -|too few trades caught|Test failed" /tmp/lookahead.log; then exit 1; fi
