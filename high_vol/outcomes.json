@@ -19,14 +19,14 @@
     "stop_loss": 0.5175257142857143,
     "tp1": 0.4817,
     "first_target_rr": 1.678415037915198,
-    "status": "PENDING_ENTRY",
-    "entry_time_utc": null,
+    "status": "ACTIVE",
+    "entry_time_utc": "2026-10-01T21:30:00+00:00",
     "closed_at_utc": null,
     "outcome": null,
-    "mfe_r": null,
-    "mae_r": null,
+    "mfe_r": 0.258,
+    "mae_r": 0.669,
     "checkpoints_r": {
-      "1h": null,
+      "1h": -0.191,
       "4h": null,
       "24h": null
     }
