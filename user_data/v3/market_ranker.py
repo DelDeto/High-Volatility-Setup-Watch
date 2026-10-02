@@ -476,7 +476,7 @@ def market_quote_volume(ticker: dict[str, Any]) -> float:
 
 
 def build_exchange():
-    exchange = ccxt.gateio(
+    exchange = ccxt.gate(
         {
             "enableRateLimit": True,
             "timeout": 20000,
