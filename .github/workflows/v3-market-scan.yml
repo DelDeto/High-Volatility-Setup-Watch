@@ -52,6 +52,11 @@ jobs:
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/market_ranker.py --self-test
 
+      - name: Prepare V3 output directory
+        run: |
+          mkdir -p user_data/v3_output
+          chmod 0777 user_data/v3_output
+
       - name: Scan Gate market and rank Top-N
         shell: bash
         env:
