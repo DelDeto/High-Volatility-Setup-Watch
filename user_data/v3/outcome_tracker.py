@@ -150,6 +150,9 @@ def freeze_plan(record: dict[str, Any], item: dict[str, Any], now: datetime) -> 
     record["volatility_regime"] = item.get("volatility_regime")
     record["range_24h_pct"] = finite(item.get("range_24h_pct"))
     record["entry_distance_atr"] = finite(item.get("entry_distance_atr"))
+    record["atr_expansion"] = finite(item.get("atr_expansion"), 1.0)
+    record["obstacle_clearance_r"] = finite(item.get("obstacle_clearance_r"), 0.0)
+    record["quality_gates"] = item.get("quality_gates", "PASS")
     record["opportunity_value"] = finite(item.get("opportunity_value"))
     record["rank_at_ready"] = item.get("rank")
     risk = abs(record["entry"] - record["stop"])
@@ -187,6 +190,8 @@ def create_record(item: dict[str, Any], now: datetime) -> dict[str, Any]:
         "latest_score": int(item.get("score", 0)),
         "latest_rr": finite(item.get("rr")),
         "latest_opportunity_value": finite(item.get("opportunity_value")),
+        "latest_atr_expansion": finite(item.get("atr_expansion"), 1.0),
+        "latest_obstacle_clearance_r": finite(item.get("obstacle_clearance_r"), 0.0),
         "ready_at": None,
         "entry": None,
         "stop": None,
@@ -199,6 +204,9 @@ def create_record(item: dict[str, Any], now: datetime) -> dict[str, Any]:
         "volatility_regime": item.get("volatility_regime"),
         "range_24h_pct": finite(item.get("range_24h_pct")),
         "entry_distance_atr": finite(item.get("entry_distance_atr")),
+        "atr_expansion": None,
+        "obstacle_clearance_r": None,
+        "quality_gates": item.get("quality_gates", "PASS"),
         "opportunity_value": finite(item.get("opportunity_value")),
         "rank_at_ready": None,
         "plan_valid": None,
@@ -241,6 +249,8 @@ def update_seen_record(
         ("latest_score", int(item.get("score", 0))),
         ("latest_rr", finite(item.get("rr"))),
         ("latest_opportunity_value", finite(item.get("opportunity_value"))),
+        ("latest_atr_expansion", finite(item.get("atr_expansion"), 1.0)),
+        ("latest_obstacle_clearance_r", finite(item.get("obstacle_clearance_r"), 0.0)),
     ):
         if record.get(key) != value:
             record[key] = value
@@ -496,6 +506,34 @@ def group_stats(records: list[dict[str, Any]], key_fn) -> dict[str, Any]:
     return out
 
 
+def atr_expansion_bucket(record: dict[str, Any]) -> str:
+    value = finite(
+        record.get("atr_expansion"),
+        finite(record.get("latest_atr_expansion"), 0.0),
+    )
+    if value < 0.90:
+        return "<0.90x"
+    if value < 1.05:
+        return "0.90-1.04x"
+    if value < 1.25:
+        return "1.05-1.24x"
+    return ">=1.25x"
+
+
+def obstacle_bucket(record: dict[str, Any]) -> str:
+    value = finite(
+        record.get("obstacle_clearance_r"),
+        finite(record.get("latest_obstacle_clearance_r"), 0.0),
+    )
+    if value < 0.75:
+        return "<0.75R"
+    if value < 1.00:
+        return "0.75-0.99R"
+    if value < 1.50:
+        return "1.00-1.49R"
+    return ">=1.50R"
+
+
 def build_summary(state: dict[str, Any]) -> dict[str, Any]:
     records = state.get("records", [])
     counts = defaultdict(int)
@@ -534,6 +572,8 @@ def build_summary(state: dict[str, Any]) -> dict[str, Any]:
         "by_volatility": group_stats(
             records, lambda r: r.get("volatility_regime", "unknown")
         ),
+        "by_atr_expansion": group_stats(records, atr_expansion_bucket),
+        "by_obstacle_clearance": group_stats(records, obstacle_bucket),
     }
 
 
@@ -882,6 +922,9 @@ def self_test() -> None:
         "range_24h_pct": 5.0,
         "entry_distance_atr": 0.2,
         "opportunity_value": 101.0,
+        "atr_expansion": 1.10,
+        "obstacle_clearance_r": 1.25,
+        "quality_gates": "PASS",
     }
     state = {"version": "V3.5", "records": []}
     first = ingest_snapshot(state, {"top_opportunities": [ready]}, now, 12)
