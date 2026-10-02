@@ -1,4 +1,4 @@
-name: V3.2 Market Opportunity Scan
+name: V3.4 Free Redundancy Market Scan
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       send_telegram:
-        description: "Send unique setup/outcome alerts to Telegram"
+        description: "Send pending/new signal and outcome alerts to Telegram"
         required: true
         type: boolean
         default: false
@@ -24,8 +24,7 @@ on:
         default: "10"
   push:
     branches:
-      - v3.2-visual-signal-pack
-      - v3.3.1-state-permissions
+      - v3.4-free-redundancy
       - main
     paths:
       - "user_data/v3/**"
@@ -42,7 +41,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,34 +67,119 @@ jobs:
             --target /freqtrade/user_data/.chartdeps \
             matplotlib
 
-      - name: V3 ranker self-test
+      - name: V3.4 self-tests
         run: |
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/market_ranker.py --self-test
 
-      - name: V3.1 outcome self-test
-        run: |
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/outcome_tracker.py --self-test
 
-      - name: V3.2 chart self-test
-        run: |
           mkdir -p user_data/v3_output/chart-self-test
-          chmod -R 0777 user_data/v3_output
+          chmod 0777 user_data/v3_output user_data/v3_output/chart-self-test
           docker compose run --rm --entrypoint python freqtrade \
             /freqtrade/user_data/v3/chart_generator.py \
             --self-test \
             --output-dir /freqtrade/user_data/v3_output/chart-self-test
 
-      - name: Prepare runtime directories
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/scan_ledger.py self-test
+
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/delivery_ledger.py
+
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/supabase_heartbeat.py \
+            --scan-state /freqtrade/user_data/v3_state/scan_state.json \
+            --delivery-state /freqtrade/user_data/v3_state/delivery.json \
+            --self-test
+
+      - name: Prepare persistent state
         run: |
           mkdir -p user_data/v3_output user_data/v3_state user_data/v3_charts
           chmod 0777 user_data/v3_output user_data/v3_state user_data/v3_charts
-          chmod 0666 user_data/v3_state/outcomes.json user_data/v3_state/outcome_summary.json
-          test -w user_data/v3_state/outcomes.json
-          test -w user_data/v3_state/outcome_summary.json
+          chmod 0666 \
+            user_data/v3_state/outcomes.json \
+            user_data/v3_state/outcome_summary.json \
+            user_data/v3_state/delivery.json \
+            user_data/v3_state/scan_state.json
 
-      - name: Scan Gate market and rank Top-N
+      - name: Plan missed 15-minute slots
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/scan_ledger.py plan \
+            --state /freqtrade/user_data/v3_state/scan_state.json \
+            --output /freqtrade/user_data/v3_output/scan_plan.json \
+            --max-catchup 8
+
+          cat user_data/v3_output/scan_plan.json
+
+      - name: Catch up missed slots
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MANUAL_SEND: ${{ inputs.send_telegram }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_UNIVERSE: ${{ inputs.universe }}
+          INPUT_DEEP: ${{ inputs.deep_limit }}
+          INPUT_TOP_N: ${{ inputs.top_n }}
+        run: |
+          set -euo pipefail
+          UNIVERSE="${INPUT_UNIVERSE:-150}"
+          DEEP="${INPUT_DEEP:-80}"
+          TOP_N="${INPUT_TOP_N:-10}"
+
+          mapfile -t MISSED < <(jq -r '.missed_slots[]' user_data/v3_output/scan_plan.json)
+
+          if [[ "${#MISSED[@]}" -eq 0 ]]; then
+            echo "V34_CATCHUP none"
+            exit 0
+          fi
+
+          for SLOT in "${MISSED[@]}"; do
+            SAFE=$(echo "$SLOT" | tr ':+' '__' | tr -d '-')
+            OUT="/freqtrade/user_data/v3_output/catchup/$SAFE"
+            mkdir -p "user_data/v3_output/catchup/$SAFE"
+            chmod 0777 "user_data/v3_output/catchup/$SAFE"
+
+            echo "V34_CATCHUP scanning $SLOT"
+
+            docker compose run --rm \
+              --entrypoint python \
+              freqtrade \
+              /freqtrade/user_data/v3/market_ranker.py \
+              --universe "$UNIVERSE" \
+              --deep-limit "$DEEP" \
+              --top-n "$TOP_N" \
+              --as-of "$SLOT" \
+              --output-dir "$OUT"
+
+            ARGS=(
+              --snapshot "$OUT/latest.json"
+              --state /freqtrade/user_data/v3_state/outcomes.json
+              --summary /freqtrade/user_data/v3_state/outcome_summary.json
+              --delivery-state /freqtrade/user_data/v3_state/delivery.json
+              --chart-dir /freqtrade/user_data/v3_charts
+              --observed-at "$SLOT"
+              --ingest-only
+            )
+
+            if [[ "$EVENT_NAME" == "schedule" || "$MANUAL_SEND" == "true" ]]; then
+              ARGS+=(--telegram)
+            fi
+
+            docker compose run --rm \
+              --entrypoint python \
+              -e TELEGRAM_BOT_TOKEN \
+              -e TELEGRAM_CHAT_ID \
+              freqtrade \
+              /freqtrade/user_data/v3/outcome_tracker.py "${ARGS[@]}"
+          done
+
+      - name: Scan current Gate market
         shell: bash
         env:
           INPUT_UNIVERSE: ${{ inputs.universe }}
@@ -116,7 +200,7 @@ jobs:
             --top-n "$TOP_N" \
             --output-dir /freqtrade/user_data/v3_output
 
-      - name: CI-test outcome integration
+      - name: CI-test V3.4 integration
         if: github.event_name == 'push'
         run: |
           docker compose run --rm \
@@ -126,9 +210,47 @@ jobs:
             --snapshot /freqtrade/user_data/v3_output/latest.json \
             --state /freqtrade/user_data/v3_state/outcomes.json \
             --summary /freqtrade/user_data/v3_state/outcome_summary.json \
+            --delivery-state /freqtrade/user_data/v3_state/delivery.json \
             --chart-dir /freqtrade/user_data/v3_charts
 
-      - name: Track unique setups and outcomes
+      - name: CI-test historical catch-up
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SLOT=$(date -u -d '30 minutes ago' '+%Y-%m-%dT%H:%M:00+00:00')
+          MINUTE=$(date -u -d "$SLOT" '+%M')
+          SLOT_MIN=$((10#$MINUTE / 15 * 15))
+          SLOT=$(date -u -d "$SLOT" '+%Y-%m-%dT%H:')$(printf '%02d' "$SLOT_MIN")":00+00:00"
+
+          mkdir -p user_data/v3_output/catchup-smoke
+          chmod 0777 user_data/v3_output/catchup-smoke
+
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/market_ranker.py \
+            --universe 40 \
+            --deep-limit 20 \
+            --top-n 5 \
+            --as-of "$SLOT" \
+            --output-dir /freqtrade/user_data/v3_output/catchup-smoke
+
+          cp user_data/v3_state/outcomes.json user_data/v3_output/ci-catchup-outcomes.json
+          cp user_data/v3_state/delivery.json user_data/v3_output/ci-catchup-delivery.json
+          chmod 0666 user_data/v3_output/ci-catchup-outcomes.json user_data/v3_output/ci-catchup-delivery.json
+
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/outcome_tracker.py \
+            --snapshot /freqtrade/user_data/v3_output/catchup-smoke/latest.json \
+            --state /freqtrade/user_data/v3_output/ci-catchup-outcomes.json \
+            --summary /freqtrade/user_data/v3_output/ci-catchup-summary.json \
+            --delivery-state /freqtrade/user_data/v3_output/ci-catchup-delivery.json \
+            --chart-dir /freqtrade/user_data/v3_charts \
+            --observed-at "$SLOT" \
+            --ingest-only
+
+          echo "V34_HISTORICAL_CATCHUP_SMOKE_OK slot=$SLOT"
+
+      - name: Track current outcomes and flush Telegram delivery
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -141,6 +263,7 @@ jobs:
             --snapshot /freqtrade/user_data/v3_output/latest.json
             --state /freqtrade/user_data/v3_state/outcomes.json
             --summary /freqtrade/user_data/v3_state/outcome_summary.json
+            --delivery-state /freqtrade/user_data/v3_state/delivery.json
             --chart-dir /freqtrade/user_data/v3_charts
           )
 
@@ -155,40 +278,90 @@ jobs:
             freqtrade \
             /freqtrade/user_data/v3/outcome_tracker.py "${ARGS[@]}"
 
+      - name: Mark successful scan heartbeat
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          CURRENT_SLOT=$(jq -r '.current_slot' user_data/v3_output/scan_plan.json)
+          MISSED_COUNT=$(jq -r '.missed_count' user_data/v3_output/scan_plan.json)
+
+          docker compose run --rm --entrypoint python freqtrade \
+            /freqtrade/user_data/v3/scan_ledger.py complete \
+            --state /freqtrade/user_data/v3_state/scan_state.json \
+            --slot "$CURRENT_SLOT" \
+            --run-id "$RUN_ID" \
+            --event "$EVENT_NAME" \
+            --catchup-count "$MISSED_COUNT"
+
+      - name: Sync external Supabase heartbeat
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          SUPABASE_PROJECT_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          docker compose run --rm \
+            --entrypoint python \
+            -e SUPABASE_PROJECT_URL \
+            -e SUPABASE_SECRET_KEY \
+            freqtrade \
+            /freqtrade/user_data/v3/supabase_heartbeat.py \
+            --scan-state /freqtrade/user_data/v3_state/scan_state.json \
+            --delivery-state /freqtrade/user_data/v3_state/delivery.json
+
       - name: Add reports to job summary
         if: always()
         run: |
           if [ -f user_data/v3_output/latest.md ]; then
             cat user_data/v3_output/latest.md >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "V3 snapshot was not produced." >> "$GITHUB_STEP_SUMMARY"
+            echo "V3.4 snapshot was not produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ -f user_data/v3_output/scan_plan.json ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.4 Catch-up Plan" >> "$GITHUB_STEP_SUMMARY"
+            cat user_data/v3_output/scan_plan.json >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [ -f user_data/v3_state/outcome_summary.json ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## V3.2 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.4 Outcome Summary" >> "$GITHUB_STEP_SUMMARY"
             cat user_data/v3_state/outcome_summary.json >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Persist V3.2 outcome state
+          if [ -f user_data/v3_state/delivery.json ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## V3.4 Delivery State" >> "$GITHUB_STEP_SUMMARY"
+            jq '{version,updated_at,pending:([.items[]|select(.status!="SENT")]|length),sent:([.items[]|select(.status=="SENT")]|length)}' \
+              user_data/v3_state/delivery.json >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Persist V3.4 state
         if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add user_data/v3_state/outcomes.json user_data/v3_state/outcome_summary.json
+          git add \
+            user_data/v3_state/outcomes.json \
+            user_data/v3_state/outcome_summary.json \
+            user_data/v3_state/delivery.json \
+            user_data/v3_state/scan_state.json
 
           if git diff --cached --quiet; then
-            echo "No outcome-state changes to persist."
+            echo "No V3.4 state changes to persist."
             exit 0
           fi
 
-          git commit -m "Update V3.2 outcome state [skip ci]"
+          git commit -m "Update V3.4 scanner state [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
 
-      - name: Upload V3.2 artifacts
+      - name: Upload V3.4 artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -196,6 +369,8 @@ jobs:
           path: |
             user_data/v3_output/
             user_data/v3_state/outcome_summary.json
+            user_data/v3_state/delivery.json
+            user_data/v3_state/scan_state.json
             user_data/v3_charts/
           if-no-files-found: warn
           retention-days: 90

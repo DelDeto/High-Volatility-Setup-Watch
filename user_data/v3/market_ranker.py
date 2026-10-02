@@ -22,6 +22,7 @@ import talib.abstract as ta
 BLOCKED_CONTRACT_TYPES = {"stocks", "indices", "commodities", "forex", "metals"}
 TF_MS = {"15m": 15 * 60 * 1000, "1h": 60 * 60 * 1000, "4h": 4 * 60 * 60 * 1000}
 REGIME_LABEL = {0: "NORMAL", 1: "HIGH", 2: "VERY_HIGH", 3: "EXTREME"}
+SCAN_AS_OF_MS: int | None = None
 
 
 @dataclass
@@ -86,9 +87,9 @@ def closed_ohlcv(exchange, symbol: str, timeframe: str, limit: int = 240) -> pd.
     if not rows:
         raise ValueError(f"No OHLCV returned for {symbol} {timeframe}")
     df = pd.DataFrame(rows, columns=["timestamp", "open", "high", "low", "close", "volume"])
-    now_ms = exchange.milliseconds()
     tf_ms = TF_MS[timeframe]
-    df = df[(df["timestamp"] + tf_ms) <= (now_ms - 2000)].copy()
+    cutoff_ms = SCAN_AS_OF_MS if SCAN_AS_OF_MS is not None else (exchange.milliseconds() - 2000)
+    df = df[(df["timestamp"] + tf_ms) <= cutoff_ms].copy()
     if df.empty:
         raise ValueError(f"No closed candles for {symbol} {timeframe}")
     return df.reset_index(drop=True)
@@ -740,8 +741,13 @@ def run_scan(args) -> dict[str, Any]:
     ready_count = sum(1 for x in resolved if x.status == "READY")
     developing_count = sum(1 for x in resolved if x.status == "DEVELOPING")
     snapshot = {
-        "version": "V3",
+        "version": "V3.4",
         "generated_at": datetime.now(timezone.utc).isoformat(),
+        "scan_as_of": (
+            datetime.fromtimestamp(SCAN_AS_OF_MS / 1000, tz=timezone.utc).isoformat()
+            if SCAN_AS_OF_MS is not None
+            else None
+        ),
         "exchange": "gate",
         "market": "USDT perpetual",
         "eligible_market_count": len(markets),
@@ -778,6 +784,10 @@ def main() -> int:
     parser.add_argument("--deep-limit", type=int, default=80)
     parser.add_argument("--top-n", type=int, default=10)
     parser.add_argument("--output-dir", default="/freqtrade/user_data/v3_output")
+    parser.add_argument(
+        "--as-of",
+        help="UTC ISO timestamp used as the closed-candle cutoff for catch-up scans",
+    )
     parser.add_argument("--telegram", action="store_true")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -785,6 +795,16 @@ def main() -> int:
     if args.self_test:
         self_test()
         return 0
+
+    global SCAN_AS_OF_MS
+    if args.as_of:
+        as_of_dt = datetime.fromisoformat(args.as_of.replace("Z", "+00:00"))
+        if as_of_dt.tzinfo is None:
+            as_of_dt = as_of_dt.replace(tzinfo=timezone.utc)
+        SCAN_AS_OF_MS = int(as_of_dt.timestamp() * 1000)
+        print(f"SCAN_AS_OF: {as_of_dt.astimezone(timezone.utc).isoformat()}")
+    else:
+        SCAN_AS_OF_MS = None
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)

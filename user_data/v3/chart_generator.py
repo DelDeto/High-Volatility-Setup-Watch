@@ -53,13 +53,19 @@ def build_exchange():
     return exchange
 
 
-def closed_ohlcv(exchange, symbol: str, timeframe: str, limit: int = 180) -> pd.DataFrame:
+def closed_ohlcv(
+    exchange,
+    symbol: str,
+    timeframe: str,
+    limit: int = 180,
+    as_of_ms: int | None = None,
+) -> pd.DataFrame:
     rows = retry(exchange.fetch_ohlcv, symbol, timeframe=timeframe, limit=limit)
     if not rows:
         raise ValueError(f"No OHLCV for {symbol} {timeframe}")
     df = pd.DataFrame(rows, columns=["timestamp", "open", "high", "low", "close", "volume"])
-    now_ms = exchange.milliseconds()
-    df = df[(df["timestamp"] + TF_MS[timeframe]) <= now_ms - 2000].copy()
+    cutoff_ms = as_of_ms if as_of_ms is not None else (exchange.milliseconds() - 2000)
+    df = df[(df["timestamp"] + TF_MS[timeframe]) <= cutoff_ms].copy()
     if len(df) < 60:
         raise ValueError(f"Insufficient closed candles for {symbol} {timeframe}")
     df["date"] = pd.to_datetime(df["timestamp"], unit="ms", utc=True)
@@ -132,7 +138,20 @@ def generate_chart(
     output_path: Path,
     candles: int = 120,
 ) -> Path:
-    raw = closed_ohlcv(exchange, record["symbol"], timeframe, max(candles + 220, 340))
+    signal_time = record.get("ready_at") or record.get("created_at")
+    as_of_ms = None
+    if signal_time:
+        dt = datetime.fromisoformat(str(signal_time).replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        as_of_ms = int(dt.timestamp() * 1000)
+    raw = closed_ohlcv(
+        exchange,
+        record["symbol"],
+        timeframe,
+        max(candles + 220, 340),
+        as_of_ms=as_of_ms,
+    )
     df = add_chart_indicators(raw, timeframe).tail(candles).reset_index(drop=True)
 
     plt, _ = _mpl()
