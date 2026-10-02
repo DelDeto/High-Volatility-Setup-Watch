@@ -7,7 +7,6 @@ on:
     paths:
       - "user_data/strategies/MarketOpportunityStrategy.py"
       - "user_data/config-backtest.json"
-      - ".github/workflows/research-backtest.yml"
   workflow_dispatch:
 
 jobs:
@@ -32,19 +31,21 @@ jobs:
       - name: Run 90d research backtest
         run: |
           set -euo pipefail
-          mkdir -p user_data/backtest_results
+          mkdir -p artifacts
           docker compose run --rm freqtrade backtesting \
             --config /freqtrade/user_data/config-backtest.json \
             --strategy MarketOpportunityStrategy \
             --export trades \
-            --export-filename /freqtrade/user_data/backtest_results/research-v2.json \
-            2>&1 | tee user_data/backtest_results/research-v2.log
-          if grep -Eq "CRITICAL|ERROR -" user_data/backtest_results/research-v2.log; then exit 1; fi
+            2>&1 | tee /tmp/research-v2.log
+          cp /tmp/research-v2.log artifacts/research-v2.log
+          if grep -Eq "CRITICAL|ERROR -" /tmp/research-v2.log; then exit 1; fi
 
       - name: Upload research results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: research-backtest-v2
-          path: user_data/backtest_results/
+          path: |
+            user_data/backtest_results/
+            artifacts/research-v2.log
           if-no-files-found: error
