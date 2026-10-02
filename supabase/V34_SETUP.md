@@ -18,7 +18,7 @@ When GitHub becomes available again, V3.4 catch-up replays up to 8 missed 15-min
    - `TELEGRAM_CHAT_ID`
 4. In Supabase Vault, create:
    - `project_url` = your Supabase project URL
-   - `publishable_key` = your project publishable key
+   - `secret_key` = your project secret key
 5. Schedule the Edge Function every 10 minutes using Supabase Cron:
 
 ```sql
@@ -31,7 +31,7 @@ select cron.schedule(
            || '/functions/v1/scanner-watchdog',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'publishable_key')
+      'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'secret_key')
     ),
     body := '{}'::jsonb,
     timeout_milliseconds := 5000
