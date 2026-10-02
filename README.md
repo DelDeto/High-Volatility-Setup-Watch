@@ -179,6 +179,99 @@ opportunity value
 
 No real orders are placed by the V3 scanner.
 
+
+## V3.1 Outcome Tracker
+
+V3.1 adds deterministic forward-outcome tracking. It is intentionally separate from the signal engine so the original V2/V3 setup rules remain measurable.
+
+### What counts as one setup?
+
+A setup is identified by:
+
+```text
+symbol + direction + setup type
+```
+
+while that setup is still open/being monitored. Repeated scanner hits do **not** create new records. After a terminal outcome, the same symbol/direction/setup is suppressed for a 12-hour cooldown before it can become a new unique setup.
+
+### State machine
+
+```text
+DEVELOPING
+   ↓
+MONITORING
+   ↓
+READY
+   ↓
+PENDING_ENTRY
+   ↓
+ACTIVE
+   ↓
+TP / SL / TIMEOUT / AMBIGUOUS
+```
+
+Rules:
+
+- DEVELOPING is tracked but is not counted as a completed trade outcome.
+- When a setup first becomes READY, Entry / SL / TP / RR are frozen for that setup.
+- Entry must be touched within 6 hours or the setup becomes EXPIRED.
+- Once active, the tracker follows 15m closed candles for up to 168 hours.
+- TP = planned RR result.
+- SL = -1R.
+- TIMEOUT records mark-to-market R after the maximum holding window.
+- If entry and an exit level, or TP and SL, are touched within the same 15m candle and ordering cannot be known, the result is AMBIGUOUS rather than guessed.
+
+### Metrics stored automatically
+
+Each READY setup can accumulate:
+
+```text
+entry_time
+MFE_R
+MAE_R
+TP / SL / TIMEOUT
+Actual_R
+hold_hours
+setup type
+LONG / SHORT
+volatility regime
+score
+initial RR
+entry distance
+```
+
+The summary aggregates:
+
+- unique setups;
+- READY unique setups;
+- completed outcomes;
+- TP / SL counts;
+- win rate on TP/SL outcomes;
+- average R;
+- profit factor in R;
+- results by setup type;
+- results by side;
+- results by volatility regime.
+
+Persistent files:
+
+- `user_data/v3_state/outcomes.json`
+- `user_data/v3_state/outcome_summary.json`
+
+Scheduled runs persist state back to `main` using a `[skip ci]` commit so the 15-minute workflow does not create a CI loop.
+
+### Telegram deduplication
+
+Telegram is now driven by the outcome tracker, not directly by every scanner snapshot.
+
+It sends only meaningful events such as:
+
+- a new unique READY/DEVELOPING setup;
+- DEVELOPING promoted to READY;
+- a terminal TP / SL / TIMEOUT / AMBIGUOUS outcome.
+
+A setup that remains unchanged across multiple 15-minute scans is not re-alerted.
+
 ## Quick start
 
 Requirements: Docker + Docker Compose.
@@ -196,10 +289,12 @@ docker compose run --rm freqtrade test-pairlist \
   --config /freqtrade/user_data/config.json
 
 # Test the V3 ranking logic without network access
-docker compose run --rm freqtrade python /freqtrade/user_data/v3/market_ranker.py --self-test
+docker compose run --rm --entrypoint python freqtrade \
+  /freqtrade/user_data/v3/market_ranker.py --self-test
 
 # Run a live V3 snapshot without Telegram
-docker compose run --rm freqtrade python /freqtrade/user_data/v3/market_ranker.py \
+docker compose run --rm --entrypoint python freqtrade \
+  /freqtrade/user_data/v3/market_ranker.py \
   --universe 150 --deep-limit 80 --top-n 10
 
 # Start continuous Freqtrade V2 dry-run
