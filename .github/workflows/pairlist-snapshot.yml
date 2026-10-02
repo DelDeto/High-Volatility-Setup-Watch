@@ -1,0 +1,23 @@
+name: Snapshot Dynamic Pairlist
+
+on:
+  workflow_dispatch:
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull Freqtrade stable
+        run: docker compose pull
+      - name: Generate current Gate crypto futures pairlist
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          docker compose run --rm freqtrade test-pairlist --config /freqtrade/user_data/config.json --print-json 2>&1 | tee artifacts/pairlist.log
+          if grep -Eq "CRITICAL|ERROR -" artifacts/pairlist.log; then exit 1; fi
+      - name: Upload pairlist snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-crypto-futures-pairlist
+          path: artifacts/pairlist.log
