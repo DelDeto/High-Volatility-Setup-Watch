@@ -503,7 +503,7 @@ def build_summary(state: dict[str, Any]) -> dict[str, Any]:
     tp_sl = [r for r in records if r.get("tracking_status") in {"TP", "SL"}]
 
     return {
-        "version": "V3.1",
+        "version": "V3.2",
         "generated_at": iso(),
         "unique_setups": len(records),
         "ready_unique": sum(1 for r in records if r.get("ready_at")),
@@ -638,13 +638,14 @@ def run_tracker(args) -> dict[str, Any]:
     state = load_json(
         state_path,
         {
-            "version": "V3.1",
+            "version": "V3.2",
             "created_at": iso(now),
             "updated_at": iso(now),
             "records": [],
         },
     )
 
+    state["version"] = "V3.2"
     exchange = build_exchange()
     outcome_events = []
     for record in state.get("records", []):
@@ -755,7 +756,7 @@ def self_test() -> None:
         "entry_distance_atr": 0.2,
         "opportunity_value": 101.0,
     }
-    state = {"version": "V3.1", "records": []}
+    state = {"version": "V3.2", "records": []}
     first = ingest_snapshot(state, {"top_opportunities": [ready]}, now, 12)
     assert len(first["new"]) == 1
     assert state["records"][0]["tracking_status"] == "PENDING_ENTRY"
@@ -804,7 +805,7 @@ def self_test() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="V3.1 deterministic outcome tracker")
+    parser = argparse.ArgumentParser(description="V3.2 deterministic outcome tracker")
     parser.add_argument("--snapshot", default="/freqtrade/user_data/v3_output/latest.json")
     parser.add_argument("--state", default="/freqtrade/user_data/v3_state/outcomes.json")
     parser.add_argument("--summary", default="/freqtrade/user_data/v3_state/outcome_summary.json")
