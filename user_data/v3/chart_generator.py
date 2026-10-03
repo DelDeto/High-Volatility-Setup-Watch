@@ -265,28 +265,47 @@ def _multipart_body(fields: dict[str, str], file_field: str, file_path: Path) ->
     return b"".join(chunks), boundary
 
 
+DEFAULT_TELEGRAM_GROUP_CHAT_ID = "-1003984243045"
+
+
+def _telegram_chat_ids() -> list[str]:
+    personal = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    group = os.getenv(
+        "TELEGRAM_GROUP_CHAT_ID",
+        DEFAULT_TELEGRAM_GROUP_CHAT_ID,
+    ).strip()
+    chat_ids: list[str] = []
+    for chat_id in (personal, group):
+        if chat_id and chat_id not in chat_ids:
+            chat_ids.append(chat_id)
+    return chat_ids
+
+
 def telegram_send_photo(photo_path: str, caption: str = "") -> bool:
     token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    chat_ids = _telegram_chat_ids()
     path = Path(photo_path)
-    if not token or not chat_id or not path.exists():
+    if not token or not chat_ids or not path.exists():
         return False
 
-    body, boundary = _multipart_body(
-        {"chat_id": chat_id, "caption": caption[:1000]},
-        "photo",
-        path,
-    )
-    req = urllib.request.Request(
-        f"https://api.telegram.org/bot{token}/sendPhoto",
-        data=body,
-        method="POST",
-        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310
-        result = json.loads(resp.read().decode("utf-8"))
-        if not result.get("ok"):
-            raise RuntimeError(f"Telegram sendPhoto failed: {result}")
+    for chat_id in chat_ids:
+        body, boundary = _multipart_body(
+            {"chat_id": chat_id, "caption": caption[:1000]},
+            "photo",
+            path,
+        )
+        req = urllib.request.Request(
+            f"https://api.telegram.org/bot{token}/sendPhoto",
+            data=body,
+            method="POST",
+            headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310
+            result = json.loads(resp.read().decode("utf-8"))
+            if not result.get("ok"):
+                raise RuntimeError(
+                    f"Telegram sendPhoto failed for {chat_id}: {result}"
+                )
     return True
 
 
