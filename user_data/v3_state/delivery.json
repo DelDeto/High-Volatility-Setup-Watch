@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-03T19:42:40.793872+00:00",
+  "updated_at": "2026-10-03T22:30:03.301411+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -637,6 +637,123 @@
       "created_at": "2026-10-03T19:40:10.058870+00:00",
       "last_attempt_at": "2026-10-03T19:40:13.622540+00:00",
       "sent_at": "2026-10-03T19:40:17.274316+00:00",
+      "last_error": null
+    },
+    "signal:ed774b37e781116c:new": {
+      "key": "signal:ed774b37e781116c:new",
+      "kind": "signal_text",
+      "signal_id": "ed774b37e781116c",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nYGG/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.027500 | SL 0.027108\nTP 0.029410 | RR 4.87R\nScore 95 | Rank #1 | Regime HIGH\nEntry distance 0.56 ATR | ATR exp 0.51x\nID ed774b37e781116c",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:19:41.131289+00:00",
+      "last_attempt_at": "2026-10-03T22:19:41.133322+00:00",
+      "sent_at": "2026-10-03T22:19:42.144779+00:00",
+      "last_error": null
+    },
+    "signal:ed774b37e781116c:chart:4h": {
+      "key": "signal:ed774b37e781116c:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "ed774b37e781116c",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:19:41.131297+00:00",
+      "last_attempt_at": "2026-10-03T22:19:42.144801+00:00",
+      "sent_at": "2026-10-03T22:19:44.813898+00:00",
+      "last_error": null
+    },
+    "signal:ed774b37e781116c:chart:1h": {
+      "key": "signal:ed774b37e781116c:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "ed774b37e781116c",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:19:41.131302+00:00",
+      "last_attempt_at": "2026-10-03T22:19:44.813918+00:00",
+      "sent_at": "2026-10-03T22:19:47.238497+00:00",
+      "last_error": null
+    },
+    "signal:fc659737a0eed5c3:new": {
+      "key": "signal:fc659737a0eed5c3:new",
+      "kind": "signal_text",
+      "signal_id": "fc659737a0eed5c3",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nAPE/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.163000 | SL 0.160256\nTP 0.170610 | RR 2.77R\nScore 87 | Rank #1 | Regime NORMAL\nEntry distance 0.29 ATR | ATR exp 0.39x\nID fc659737a0eed5c3",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:21:21.576507+00:00",
+      "last_attempt_at": "2026-10-03T22:21:21.578573+00:00",
+      "sent_at": "2026-10-03T22:21:22.555389+00:00",
+      "last_error": null
+    },
+    "signal:fc659737a0eed5c3:chart:4h": {
+      "key": "signal:fc659737a0eed5c3:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "fc659737a0eed5c3",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:21:21.576516+00:00",
+      "last_attempt_at": "2026-10-03T22:21:22.555411+00:00",
+      "sent_at": "2026-10-03T22:21:24.992656+00:00",
+      "last_error": null
+    },
+    "signal:fc659737a0eed5c3:chart:1h": {
+      "key": "signal:fc659737a0eed5c3:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "fc659737a0eed5c3",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:21:21.576521+00:00",
+      "last_attempt_at": "2026-10-03T22:21:24.992676+00:00",
+      "sent_at": "2026-10-03T22:21:27.004333+00:00",
+      "last_error": null
+    },
+    "signal:b548e7c66675c4b5:new": {
+      "key": "signal:b548e7c66675c4b5:new",
+      "kind": "signal_text",
+      "signal_id": "b548e7c66675c4b5",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nENJ/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.033700 | SL 0.032372\nTP 0.037430 | RR 2.81R\nScore 87 | Rank #1 | Regime VERY_HIGH\nEntry distance 0.05 ATR | ATR exp 0.45x\nID b548e7c66675c4b5",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:24:20.335028+00:00",
+      "last_attempt_at": "2026-10-03T22:24:20.337305+00:00",
+      "sent_at": "2026-10-03T22:24:21.337115+00:00",
+      "last_error": null
+    },
+    "signal:b548e7c66675c4b5:chart:4h": {
+      "key": "signal:b548e7c66675c4b5:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "b548e7c66675c4b5",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:24:20.335037+00:00",
+      "last_attempt_at": "2026-10-03T22:24:21.337138+00:00",
+      "sent_at": "2026-10-03T22:24:23.829738+00:00",
+      "last_error": null
+    },
+    "signal:b548e7c66675c4b5:chart:1h": {
+      "key": "signal:b548e7c66675c4b5:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "b548e7c66675c4b5",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-03T22:24:20.335053+00:00",
+      "last_attempt_at": "2026-10-03T22:24:23.829767+00:00",
+      "sent_at": "2026-10-03T22:24:25.910706+00:00",
       "last_error": null
     }
   }
