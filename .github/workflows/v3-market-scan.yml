@@ -142,6 +142,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_GROUP_CHAT_ID: "-1003984243045"
           MANUAL_SEND: ${{ inputs.send_telegram }}
           EVENT_NAME: ${{ github.event_name }}
           INPUT_UNIVERSE: ${{ inputs.universe }}
@@ -196,6 +197,7 @@ jobs:
               --entrypoint python \
               -e TELEGRAM_BOT_TOKEN \
               -e TELEGRAM_CHAT_ID \
+              -e TELEGRAM_GROUP_CHAT_ID \
               freqtrade \
               /freqtrade/user_data/v3/outcome_tracker.py "${ARGS[@]}"
           done
@@ -276,6 +278,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_GROUP_CHAT_ID: "-1003984243045"
           MANUAL_SEND: ${{ inputs.send_telegram }}
           EVENT_NAME: ${{ github.event_name }}
         run: |
@@ -322,6 +325,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_GROUP_CHAT_ID: "-1003984243045"
         run: |
           set -euo pipefail
 
