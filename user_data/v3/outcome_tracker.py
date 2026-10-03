@@ -16,7 +16,11 @@ from typing import Any
 
 import ccxt
 
-from chart_generator import generate_ready_charts, telegram_send_photo
+from chart_generator import (
+    CHART_STYLE_VERSION,
+    generate_ready_charts,
+    telegram_send_photo,
+)
 from delivery_ledger import (
     enqueue,
     load_delivery,
@@ -692,51 +696,93 @@ def ensure_ready_charts(
         "PENDING_ENTRY", "ACTIVE", "TP", "SL", "TIMEOUT", "AMBIGUOUS"
     }:
         return False
+
     charts = record.get("charts") or {}
     existing = all(Path(p).exists() for p in charts.values()) if charts else False
-    if existing and {"1h", "4h"}.issubset(charts):
+    style_current = (
+        record.get("chart_style_version") == CHART_STYLE_VERSION
+    )
+
+    if existing and {"1h", "4h"}.issubset(charts) and style_current:
         return False
 
     generated = generate_ready_charts(exchange, record, chart_dir)
     record["charts"] = generated
     record["chart_generated_at"] = iso()
+    record["chart_style_version"] = CHART_STYLE_VERSION
     return True
 
 
 def ready_chart_caption(record: dict[str, Any], timeframe: str) -> str:
     label = "4H CONTEXT" if timeframe == "4h" else "1H SETUP / ENTRY"
+    side = str(record.get("side") or "-").upper()
+    icon = "🟢" if side == "LONG" else "🔴"
+    setup = str(record.get("setup") or "-").replace("_", " ").upper()
+
     return (
-        f"{label} | {record['symbol']} {record['side']}\n"
-        f"{record['setup']} | RR {finite(record.get('rr')):.2f}R | "
-        f"Score {record.get('score')} | ID {record.get('signal_id')}"
+        f"{icon} V3.5 READY · {label}\n"
+        f"{record['symbol']} · {side} · {setup}\n"
+        f"Entry {price_fmt(record.get('entry'))} | "
+        f"SL {price_fmt(record.get('stop'))} | "
+        f"TP {price_fmt(record.get('target'))}\n"
+        f"RR {finite(record.get('rr')):.2f}R | "
+        f"Score {record.get('score')} | "
+        f"Rank #{record.get('latest_rank')}\n"
+        f"Style: Market Scan · ID {record.get('signal_id')}"
     )
 
 
 def signal_alert(record: dict[str, Any], promoted: bool = False) -> str:
-    label = "PROMOTED TO READY" if promoted else record.get("scanner_status", "NEW SETUP")
+    status = str(record.get("scanner_status") or "NEW SETUP").upper()
+    if promoted:
+        status = "PROMOTED TO READY"
+
+    side = str(record.get("side") or "-").upper()
+    setup = str(record.get("setup") or "-").replace("_", " ").upper()
+    icon = "🔥" if record.get("tracking_status") == "PENDING_ENTRY" else "🛰"
+
     lines = [
-        f"🚀 V3.5 {label}",
-        f"{record['symbol']} {record['side']} | {record['setup']}",
+        f"{icon} FREQTRADE V3.5 — {status}",
+        f"{record['symbol']} · {side} · {setup}",
     ]
+
     if record.get("tracking_status") == "PENDING_ENTRY":
         lines.extend(
             [
-                f"Entry {price_fmt(record['entry'])}",
-                f"SL {price_fmt(record['stop'])} | TP {price_fmt(record['target'])}",
-                f"RR {finite(record['rr']):.2f}R | Score {record.get('score')}",
-                f"Regime {record.get('volatility_regime')} | Rank #{record.get('latest_rank')}",
+                (
+                    f"Entry {price_fmt(record['entry'])} | "
+                    f"SL {price_fmt(record['stop'])}"
+                ),
+                (
+                    f"TP {price_fmt(record['target'])} | "
+                    f"RR {finite(record['rr']):.2f}R"
+                ),
+                (
+                    f"Score {record.get('score')} | "
+                    f"Rank #{record.get('latest_rank')} | "
+                    f"Regime {record.get('volatility_regime')}"
+                ),
+                (
+                    f"Entry distance "
+                    f"{finite(record.get('entry_distance_atr')):.2f} ATR | "
+                    f"ATR exp {finite(record.get('atr_expansion'), 1.0):.2f}x"
+                ),
                 f"ID {record['signal_id']}",
             ]
         )
     else:
         lines.extend(
             [
-                f"Status DEVELOPING / WATCHLIST | Rank #{record.get('latest_rank')}",
-                "WATCHLIST ONLY — no entry/SL/TP until promoted to READY",
-                f"Latest RR {finite(record.get('latest_rr')):.2f}R | Score {record.get('latest_score')}",
+                f"DEVELOPING / WATCHLIST · Rank #{record.get('latest_rank')}",
+                "WAIT — chưa có execution map cho tới khi READY",
+                (
+                    f"Latest RR {finite(record.get('latest_rr')):.2f}R | "
+                    f"Score {record.get('latest_score')}"
+                ),
                 f"ID {record['signal_id']}",
             ]
         )
+
     return "\n".join(lines)
 
 
@@ -745,17 +791,30 @@ def outcome_alert(event: dict[str, Any]) -> str:
     kind = event["type"]
     if kind not in {"TP", "SL", "TIMEOUT", "AMBIGUOUS"}:
         return ""
+
+    icons = {
+        "TP": "🎯",
+        "SL": "🛑",
+        "TIMEOUT": "⏰",
+        "AMBIGUOUS": "⚠️",
+    }
+    side = str(record.get("side") or "-").upper()
+    setup = str(record.get("setup") or "-").replace("_", " ").upper()
+
     lines = [
-        f"📊 V3.5 OUTCOME {kind}",
-        f"{record['symbol']} {record['side']} | {record['setup']}",
-        f"ID {record['signal_id']}",
+        f"{icons.get(kind, '📊')} FREQTRADE V3.5 — {kind}",
+        f"{record['symbol']} · {side} · {setup}",
     ]
+
     if record.get("actual_r") is not None:
-        lines.append(f"Actual R: {finite(record['actual_r']):+.2f}R")
+        lines.append(f"Actual R {finite(record['actual_r']):+.2f}R")
     if record.get("mfe_r") is not None:
         lines.append(
-            f"MFE {finite(record['mfe_r']):+.2f}R | MAE {finite(record['mae_r']):+.2f}R"
+            f"MFE {finite(record['mfe_r']):+.2f}R | "
+            f"MAE {finite(record['mae_r']):+.2f}R"
         )
+
+    lines.append(f"ID {record['signal_id']}")
     return "\n".join(lines)
 
 
