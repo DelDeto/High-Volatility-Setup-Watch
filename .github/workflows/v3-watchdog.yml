@@ -37,6 +37,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_GROUP_CHAT_ID: "-1003984243045"
           EVENT_NAME: ${{ github.event_name }}
           REF_NAME: ${{ github.ref }}
           FORCE_INPUT: ${{ inputs.force_recovery }}
@@ -46,6 +47,24 @@ jobs:
         run: |
           set -euo pipefail
           NOW=$(date +%s)
+
+          telegram_send_all() {
+            local message="$1"
+            local sent_group="false"
+            for chat_id in "${TELEGRAM_CHAT_ID:-}" "${TELEGRAM_GROUP_CHAT_ID:-}"; do
+              [[ -z "$chat_id" ]] && continue
+              if [[ "$chat_id" == "${TELEGRAM_CHAT_ID:-}" && "$sent_group" == "true" ]]; then
+                continue
+              fi
+              curl -fsS -X POST \
+                "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+                --data-urlencode "chat_id=$chat_id" \
+                --data-urlencode "text=$message" >/dev/null
+              if [[ "$chat_id" == "${TELEGRAM_GROUP_CHAT_ID:-}" ]]; then
+                sent_group="true"
+              fi
+            done
+          }
 
           RUNS=$(gh api -H "Accept: application/vnd.github+json"             "/repos/$GITHUB_REPOSITORY/actions/workflows/$PRIMARY_WORKFLOW/runs?per_page=30")
 
@@ -123,7 +142,7 @@ jobs:
 
           ALERT=$(printf '%s\n'             "⚠️ V3.4 WATCHDOG"             "Automatic recovery triggered."             "Heartbeat age: ${AGE_MIN} min"             "Pending Telegram items: $PENDING_COUNT (oldest ${DELIVERY_MIN} min)"             "Starting replacement + catch-up scan.")
 
-          curl -fsS -X POST             "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"             --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"             --data-urlencode "text=$ALERT" >/dev/null
+          telegram_send_all "$ALERT"
 
           START_EPOCH=$(date +%s)
 
@@ -160,15 +179,15 @@ jobs:
 
             if [[ "$CONCLUSION" == "success" ]]; then
               OK=$(printf '%s\n'                 "✅ V3.4 WATCHDOG RECOVERED"                 "Replacement scan + catch-up completed successfully."                 "Pending Telegram delivery was retried."                 "Normal monitoring is restored.")
-              curl -fsS -X POST                 "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"                 --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"                 --data-urlencode "text=$OK" >/dev/null
+              telegram_send_all "$OK"
               exit 0
             fi
 
             FAIL=$(printf '%s\n'               "🚨 V3.4 WATCHDOG RECOVERY FAILED"               "Replacement conclusion: $CONCLUSION"               "$RUN_URL")
-            curl -fsS -X POST               "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"               --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"               --data-urlencode "text=$FAIL" >/dev/null
+            telegram_send_all "$FAIL"
             exit 1
           done
 
           TIMEOUT=$(printf '%s\n'             "🚨 V3.4 WATCHDOG TIMEOUT"             "Recovery was dispatched but did not complete within 12 minutes.")
-          curl -fsS -X POST             "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"             --data-urlencode "chat_id=$TELEGRAM_CHAT_ID"             --data-urlencode "text=$TIMEOUT" >/dev/null
+          telegram_send_all "$TIMEOUT"
           exit 1

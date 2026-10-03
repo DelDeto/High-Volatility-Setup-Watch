@@ -642,21 +642,44 @@ def price_fmt(value: Any) -> str:
     return f"{x:.8f}"
 
 
+DEFAULT_TELEGRAM_GROUP_CHAT_ID = "-1003984243045"
+
+
+def telegram_chat_ids() -> list[str]:
+    personal = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    group = os.getenv(
+        "TELEGRAM_GROUP_CHAT_ID",
+        DEFAULT_TELEGRAM_GROUP_CHAT_ID,
+    ).strip()
+    chat_ids: list[str] = []
+    for chat_id in (personal, group):
+        if chat_id and chat_id not in chat_ids:
+            chat_ids.append(chat_id)
+    return chat_ids
+
+
 def telegram_send(text: str) -> bool:
     token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
-    if not token or not chat_id or not text:
+    chat_ids = telegram_chat_ids()
+    if not token or not chat_ids or not text:
         return False
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = urllib.parse.urlencode(
-        {"chat_id": chat_id, "text": text[:3900], "disable_web_page_preview": "true"}
-    ).encode()
-    req = urllib.request.Request(url, data=payload, method="POST")
-    with urllib.request.urlopen(req, timeout=20) as resp:  # noqa: S310
-        body = json.loads(resp.read().decode("utf-8"))
-        if not body.get("ok"):
-            raise RuntimeError(f"Telegram send failed: {body}")
+    for chat_id in chat_ids:
+        payload = urllib.parse.urlencode(
+            {
+                "chat_id": chat_id,
+                "text": text[:3900],
+                "disable_web_page_preview": "true",
+            }
+        ).encode()
+        req = urllib.request.Request(url, data=payload, method="POST")
+        with urllib.request.urlopen(req, timeout=20) as resp:  # noqa: S310
+            body = json.loads(resp.read().decode("utf-8"))
+            if not body.get("ok"):
+                raise RuntimeError(
+                    f"Telegram send failed for {chat_id}: {body}"
+                )
     return True
 
 
