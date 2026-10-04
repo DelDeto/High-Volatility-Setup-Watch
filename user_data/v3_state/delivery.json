@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-04T07:37:41.667573+00:00",
+  "updated_at": "2026-10-04T08:24:40.849838+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -858,6 +858,71 @@
       "created_at": "2026-10-04T07:37:40.605464+00:00",
       "last_attempt_at": "2026-10-04T07:37:40.607610+00:00",
       "sent_at": "2026-10-04T07:37:41.666616+00:00",
+      "last_error": null
+    },
+    "signal:608f08c9aa8857b8:new": {
+      "key": "signal:608f08c9aa8857b8:new",
+      "kind": "signal_text",
+      "signal_id": "608f08c9aa8857b8",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\nSUPER/USDT:USDT · LONG · TREND PULLBACK\nDEVELOPING / WATCHLIST · Rank #1\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 2.20R | Score 83\nID 608f08c9aa8857b8",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T08:22:19.020936+00:00",
+      "last_attempt_at": "2026-10-04T08:22:19.023193+00:00",
+      "sent_at": "2026-10-04T08:22:20.812082+00:00",
+      "last_error": null
+    },
+    "signal:9be6b4cdae28cde6:new": {
+      "key": "signal:9be6b4cdae28cde6:new",
+      "kind": "signal_text",
+      "signal_id": "9be6b4cdae28cde6",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nWLD/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.590900 | SL 0.581678\nTP 0.618900 | RR 3.04R\nScore 85 | Rank #1 | Regime HIGH\nEntry distance 0.41 ATR | ATR exp 0.74x\nID 9be6b4cdae28cde6",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T08:23:27.819552+00:00",
+      "last_attempt_at": "2026-10-04T08:23:27.821794+00:00",
+      "sent_at": "2026-10-04T08:23:29.136755+00:00",
+      "last_error": null
+    },
+    "signal:9be6b4cdae28cde6:chart:4h": {
+      "key": "signal:9be6b4cdae28cde6:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "9be6b4cdae28cde6",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T08:23:27.819561+00:00",
+      "last_attempt_at": "2026-10-04T08:23:29.136782+00:00",
+      "sent_at": "2026-10-04T08:23:32.301383+00:00",
+      "last_error": null
+    },
+    "signal:9be6b4cdae28cde6:chart:1h": {
+      "key": "signal:9be6b4cdae28cde6:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "9be6b4cdae28cde6",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T08:23:27.819566+00:00",
+      "last_attempt_at": "2026-10-04T08:23:32.301404+00:00",
+      "sent_at": "2026-10-04T08:23:35.380854+00:00",
+      "last_error": null
+    },
+    "signal:d23d8c1ba6bb1b9f:new": {
+      "key": "signal:d23d8c1ba6bb1b9f:new",
+      "kind": "signal_text",
+      "signal_id": "d23d8c1ba6bb1b9f",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\nAVAX/USDT:USDT · LONG · TREND PULLBACK\nDEVELOPING / WATCHLIST · Rank #2\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 1.82R | Score 75\nID d23d8c1ba6bb1b9f",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T08:23:27.819578+00:00",
+      "last_attempt_at": "2026-10-04T08:23:35.380873+00:00",
+      "sent_at": "2026-10-04T08:23:36.704361+00:00",
       "last_error": null
     }
   }
