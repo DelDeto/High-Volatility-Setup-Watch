@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-03T22:32:07.410914+00:00",
+  "updated_at": "2026-10-04T01:55:50.133531+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -754,6 +754,45 @@
       "created_at": "2026-10-03T22:24:20.335053+00:00",
       "last_attempt_at": "2026-10-03T22:24:23.829767+00:00",
       "sent_at": "2026-10-03T22:24:25.910706+00:00",
+      "last_error": null
+    },
+    "signal:27c8ff8058d123a6:new": {
+      "key": "signal:27c8ff8058d123a6:new",
+      "kind": "signal_text",
+      "signal_id": "27c8ff8058d123a6",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nGALA/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.00252700 | SL 0.00248267\nTP 0.00275800 | RR 5.21R\nScore 95 | Rank #1 | Regime HIGH\nEntry distance 0.44 ATR | ATR exp 0.48x\nID 27c8ff8058d123a6",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T01:51:52.379767+00:00",
+      "last_attempt_at": "2026-10-04T01:51:52.381333+00:00",
+      "sent_at": "2026-10-04T01:51:53.474202+00:00",
+      "last_error": null
+    },
+    "signal:27c8ff8058d123a6:chart:4h": {
+      "key": "signal:27c8ff8058d123a6:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "27c8ff8058d123a6",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T01:51:52.379774+00:00",
+      "last_attempt_at": "2026-10-04T01:51:53.474225+00:00",
+      "sent_at": "2026-10-04T01:51:56.318510+00:00",
+      "last_error": null
+    },
+    "signal:27c8ff8058d123a6:chart:1h": {
+      "key": "signal:27c8ff8058d123a6:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "27c8ff8058d123a6",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T01:51:52.379778+00:00",
+      "last_attempt_at": "2026-10-04T01:51:56.318531+00:00",
+      "sent_at": "2026-10-04T01:51:59.006382+00:00",
       "last_error": null
     }
   }

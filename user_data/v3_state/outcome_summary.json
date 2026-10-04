@@ -1,13 +1,12 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-03T22:32:07.408505+00:00",
-  "unique_setups": 21,
-  "ready_unique": 16,
+  "generated_at": "2026-10-04T01:55:50.131345+00:00",
+  "unique_setups": 22,
+  "ready_unique": 17,
   "tracking_counts": {
-    "ACTIVE": 8,
-    "EXPIRED": 4,
+    "ACTIVE": 9,
+    "EXPIRED": 5,
     "MONITORING": 1,
-    "PENDING_ENTRY": 1,
     "SL": 6,
     "TP": 1
   },
@@ -16,13 +15,13 @@
   "sl": 6,
   "timeouts": 0,
   "ambiguous": 0,
-  "expired": 4,
+  "expired": 5,
   "win_rate_tp_sl": 0.14285714285714285,
   "average_r": -0.4478176306341171,
   "profit_factor_r": 0.47754609759353,
   "by_setup": {
     "trend_pullback": {
-      "records": 18,
+      "records": 19,
       "completed": 6,
       "wins_tp": 0,
       "losses_sl": 6,
@@ -42,7 +41,7 @@
   },
   "by_side": {
     "LONG": {
-      "records": 18,
+      "records": 19,
       "completed": 6,
       "wins_tp": 1,
       "losses_sl": 5,
@@ -62,7 +61,7 @@
   },
   "by_volatility": {
     "HIGH": {
-      "records": 6,
+      "records": 7,
       "completed": 1,
       "wins_tp": 0,
       "losses_sl": 1,
@@ -109,7 +108,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 14,
+      "records": 15,
       "completed": 4,
       "wins_tp": 1,
       "losses_sl": 3,
@@ -147,7 +146,7 @@
       "profit_factor_r": null
     },
     "<0.75R": {
-      "records": 10,
+      "records": 11,
       "completed": 2,
       "wins_tp": 0,
       "losses_sl": 2,
@@ -212,7 +211,7 @@
       "profit_factor_r": 2.86527658556118
     },
     ">=95": {
-      "records": 5,
+      "records": 6,
       "completed": 2,
       "wins_tp": 0,
       "losses_sl": 2,
@@ -250,7 +249,7 @@
       "profit_factor_r": 0.0
     },
     ">=4.0R": {
-      "records": 2,
+      "records": 3,
       "completed": 1,
       "wins_tp": 0,
       "losses_sl": 1,
@@ -288,7 +287,7 @@
       "profit_factor_r": null
     },
     "0.35-0.59 ATR": {
-      "records": 3,
+      "records": 4,
       "completed": 1,
       "wins_tp": 0,
       "losses_sl": 1,
