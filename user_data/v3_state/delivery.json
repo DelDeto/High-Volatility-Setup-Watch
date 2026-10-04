@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-04T20:38:51.665180+00:00",
+  "updated_at": "2026-10-04T21:42:33.125403+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -1196,6 +1196,71 @@
       "created_at": "2026-10-04T18:15:42.661530+00:00",
       "last_attempt_at": "2026-10-04T18:15:53.734586+00:00",
       "sent_at": "2026-10-04T18:15:56.667947+00:00",
+      "last_error": null
+    },
+    "signal:033b334a461093e1:new": {
+      "key": "signal:033b334a461093e1:new",
+      "kind": "signal_text",
+      "signal_id": "033b334a461093e1",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nZAMA/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.086020 | SL 0.083286\nTP 0.092410 | RR 2.34R\nScore 83 | Rank #1 | Regime HIGH\nEntry distance 0.26 ATR | ATR exp 0.57x\nID 033b334a461093e1",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T21:41:23.856509+00:00",
+      "last_attempt_at": "2026-10-04T21:41:23.859254+00:00",
+      "sent_at": "2026-10-04T21:41:25.319304+00:00",
+      "last_error": null
+    },
+    "signal:033b334a461093e1:chart:4h": {
+      "key": "signal:033b334a461093e1:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "033b334a461093e1",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T21:41:23.856519+00:00",
+      "last_attempt_at": "2026-10-04T21:41:25.319327+00:00",
+      "sent_at": "2026-10-04T21:41:28.960230+00:00",
+      "last_error": null
+    },
+    "signal:033b334a461093e1:chart:1h": {
+      "key": "signal:033b334a461093e1:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "033b334a461093e1",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T21:41:23.856524+00:00",
+      "last_attempt_at": "2026-10-04T21:41:28.960251+00:00",
+      "sent_at": "2026-10-04T21:41:32.433448+00:00",
+      "last_error": null
+    },
+    "outcome:2fd2e303a2ee0a66:SL": {
+      "key": "outcome:2fd2e303a2ee0a66:SL",
+      "kind": "outcome_text",
+      "signal_id": "2fd2e303a2ee0a66",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nAAVE/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +2.10R | MAE -1.00R\nID 2fd2e303a2ee0a66",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T21:42:30.544282+00:00",
+      "last_attempt_at": "2026-10-04T21:42:30.547074+00:00",
+      "sent_at": "2026-10-04T21:42:31.817080+00:00",
+      "last_error": null
+    },
+    "outcome:de870376fa841a25:SL": {
+      "key": "outcome:de870376fa841a25:SL",
+      "kind": "outcome_text",
+      "signal_id": "de870376fa841a25",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nQNT/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +0.03R | MAE -2.63R\nID de870376fa841a25",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T21:42:30.544303+00:00",
+      "last_attempt_at": "2026-10-04T21:42:31.817100+00:00",
+      "sent_at": "2026-10-04T21:42:33.124053+00:00",
       "last_error": null
     }
   }
