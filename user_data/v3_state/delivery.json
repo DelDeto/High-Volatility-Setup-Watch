@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-04T17:56:31.786034+00:00",
+  "updated_at": "2026-10-04T18:15:56.669115+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -1118,6 +1118,84 @@
       "created_at": "2026-10-04T17:56:30.759246+00:00",
       "last_attempt_at": "2026-10-04T17:56:30.761689+00:00",
       "sent_at": "2026-10-04T17:56:31.784979+00:00",
+      "last_error": null
+    },
+    "signal:de870376fa841a25:new": {
+      "key": "signal:de870376fa841a25:new",
+      "kind": "signal_text",
+      "signal_id": "de870376fa841a25",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nQNT/USDT:USDT · LONG · TREND PULLBACK\nEntry 258.2500 | SL 250.4971\nTP 277.8700 | RR 2.53R\nScore 87 | Rank #2 | Regime HIGH\nEntry distance 0.17 ATR | ATR exp 0.77x\nID de870376fa841a25",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T18:15:42.661491+00:00",
+      "last_attempt_at": "2026-10-04T18:15:42.664078+00:00",
+      "sent_at": "2026-10-04T18:15:43.761482+00:00",
+      "last_error": null
+    },
+    "signal:de870376fa841a25:chart:4h": {
+      "key": "signal:de870376fa841a25:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "de870376fa841a25",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T18:15:42.661500+00:00",
+      "last_attempt_at": "2026-10-04T18:15:43.761507+00:00",
+      "sent_at": "2026-10-04T18:15:46.617379+00:00",
+      "last_error": null
+    },
+    "signal:de870376fa841a25:chart:1h": {
+      "key": "signal:de870376fa841a25:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "de870376fa841a25",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T18:15:42.661505+00:00",
+      "last_attempt_at": "2026-10-04T18:15:46.617401+00:00",
+      "sent_at": "2026-10-04T18:15:49.362256+00:00",
+      "last_error": null
+    },
+    "signal:7e37b49e499bc020:new": {
+      "key": "signal:7e37b49e499bc020:new",
+      "kind": "signal_text",
+      "signal_id": "7e37b49e499bc020",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nJASMY/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.00538700 | SL 0.00530968\nTP 0.00558300 | RR 2.53R\nScore 82 | Rank #3 | Regime NORMAL\nEntry distance 0.66 ATR | ATR exp 0.85x\nID 7e37b49e499bc020",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T18:15:42.661522+00:00",
+      "last_attempt_at": "2026-10-04T18:15:49.362276+00:00",
+      "sent_at": "2026-10-04T18:15:50.428889+00:00",
+      "last_error": null
+    },
+    "signal:7e37b49e499bc020:chart:4h": {
+      "key": "signal:7e37b49e499bc020:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "7e37b49e499bc020",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T18:15:42.661527+00:00",
+      "last_attempt_at": "2026-10-04T18:15:50.428911+00:00",
+      "sent_at": "2026-10-04T18:15:53.734563+00:00",
+      "last_error": null
+    },
+    "signal:7e37b49e499bc020:chart:1h": {
+      "key": "signal:7e37b49e499bc020:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "7e37b49e499bc020",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T18:15:42.661530+00:00",
+      "last_attempt_at": "2026-10-04T18:15:53.734586+00:00",
+      "sent_at": "2026-10-04T18:15:56.667947+00:00",
       "last_error": null
     }
   }
