@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-04T21:42:33.125403+00:00",
+  "updated_at": "2026-10-04T23:33:30.118382+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -1261,6 +1261,45 @@
       "created_at": "2026-10-04T21:42:30.544303+00:00",
       "last_attempt_at": "2026-10-04T21:42:31.817100+00:00",
       "sent_at": "2026-10-04T21:42:33.124053+00:00",
+      "last_error": null
+    },
+    "signal:c0f7f7c64df22e4b:new": {
+      "key": "signal:c0f7f7c64df22e4b:new",
+      "kind": "signal_text",
+      "signal_id": "c0f7f7c64df22e4b",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nWLD/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.579800 | SL 0.571938\nTP 0.599900 | RR 2.56R\nScore 82 | Rank #1 | Regime NORMAL\nEntry distance 0.65 ATR | ATR exp 0.95x\nID c0f7f7c64df22e4b",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T23:29:37.666013+00:00",
+      "last_attempt_at": "2026-10-04T23:29:37.668844+00:00",
+      "sent_at": "2026-10-04T23:29:39.138795+00:00",
+      "last_error": null
+    },
+    "signal:c0f7f7c64df22e4b:chart:4h": {
+      "key": "signal:c0f7f7c64df22e4b:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "c0f7f7c64df22e4b",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T23:29:37.666022+00:00",
+      "last_attempt_at": "2026-10-04T23:29:39.138815+00:00",
+      "sent_at": "2026-10-04T23:29:41.995116+00:00",
+      "last_error": null
+    },
+    "signal:c0f7f7c64df22e4b:chart:1h": {
+      "key": "signal:c0f7f7c64df22e4b:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "c0f7f7c64df22e4b",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-04T23:29:37.666028+00:00",
+      "last_attempt_at": "2026-10-04T23:29:41.995135+00:00",
+      "sent_at": "2026-10-04T23:29:44.905122+00:00",
       "last_error": null
     }
   }
