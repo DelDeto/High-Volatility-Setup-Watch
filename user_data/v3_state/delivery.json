@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-05T12:57:27.170450+00:00",
+  "updated_at": "2026-10-05T17:50:31.010588+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -1495,6 +1495,19 @@
       "created_at": "2026-10-05T12:57:25.156114+00:00",
       "last_attempt_at": "2026-10-05T12:57:26.190399+00:00",
       "sent_at": "2026-10-05T12:57:27.169076+00:00",
+      "last_error": null
+    },
+    "outcome:7e37b49e499bc020:SL": {
+      "key": "outcome:7e37b49e499bc020:SL",
+      "kind": "outcome_text",
+      "signal_id": "7e37b49e499bc020",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nJASMY/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +1.54R | MAE -1.16R\nID 7e37b49e499bc020",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-05T17:50:29.840384+00:00",
+      "last_attempt_at": "2026-10-05T17:50:29.843460+00:00",
+      "sent_at": "2026-10-05T17:50:31.009268+00:00",
       "last_error": null
     }
   }
