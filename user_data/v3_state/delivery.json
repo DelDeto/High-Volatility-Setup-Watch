@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-06T01:45:58.559113+00:00",
+  "updated_at": "2026-10-06T03:19:11.312519+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -1612,6 +1612,19 @@
       "created_at": "2026-10-06T01:45:56.634879+00:00",
       "last_attempt_at": "2026-10-06T01:45:57.605496+00:00",
       "sent_at": "2026-10-06T01:45:58.557831+00:00",
+      "last_error": null
+    },
+    "outcome:6cd890fdf3e9b128:SL": {
+      "key": "outcome:6cd890fdf3e9b128:SL",
+      "kind": "outcome_text",
+      "signal_id": "6cd890fdf3e9b128",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nCARV/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +1.26R | MAE -1.13R\nID 6cd890fdf3e9b128",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T03:19:10.119135+00:00",
+      "last_attempt_at": "2026-10-06T03:19:10.122206+00:00",
+      "sent_at": "2026-10-06T03:19:11.311151+00:00",
       "last_error": null
     }
   }
