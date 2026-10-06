@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-06T03:19:11.312519+00:00",
+  "updated_at": "2026-10-06T08:17:31.244470+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -1625,6 +1625,58 @@
       "created_at": "2026-10-06T03:19:10.119135+00:00",
       "last_attempt_at": "2026-10-06T03:19:10.122206+00:00",
       "sent_at": "2026-10-06T03:19:11.311151+00:00",
+      "last_error": null
+    },
+    "signal:644e12acd99f2bb0:new": {
+      "key": "signal:644e12acd99f2bb0:new",
+      "kind": "signal_text",
+      "signal_id": "644e12acd99f2bb0",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nFLOKI/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.00002884 | SL 0.00002826\nTP 0.00003001 | RR 2.03R\nScore 93 | Rank #1 | Regime NORMAL\nEntry distance 0.03 ATR | ATR exp 0.62x\nID 644e12acd99f2bb0",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T08:10:00.686888+00:00",
+      "last_attempt_at": "2026-10-06T08:10:00.690120+00:00",
+      "sent_at": "2026-10-06T08:10:01.990787+00:00",
+      "last_error": null
+    },
+    "signal:644e12acd99f2bb0:chart:4h": {
+      "key": "signal:644e12acd99f2bb0:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "644e12acd99f2bb0",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T08:10:00.686897+00:00",
+      "last_attempt_at": "2026-10-06T08:10:01.990811+00:00",
+      "sent_at": "2026-10-06T08:10:04.722529+00:00",
+      "last_error": null
+    },
+    "signal:644e12acd99f2bb0:chart:1h": {
+      "key": "signal:644e12acd99f2bb0:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "644e12acd99f2bb0",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T08:10:00.686902+00:00",
+      "last_attempt_at": "2026-10-06T08:10:04.722547+00:00",
+      "sent_at": "2026-10-06T08:10:07.375394+00:00",
+      "last_error": null
+    },
+    "signal:a565817a4aed7ba0:new": {
+      "key": "signal:a565817a4aed7ba0:new",
+      "kind": "signal_text",
+      "signal_id": "a565817a4aed7ba0",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\nYGG/USDT:USDT · LONG · TREND PULLBACK\nDEVELOPING / WATCHLIST · Rank #1\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 2.17R | Score 88\nID a565817a4aed7ba0",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T08:14:33.432437+00:00",
+      "last_attempt_at": "2026-10-06T08:14:33.435695+00:00",
+      "sent_at": "2026-10-06T08:14:34.484306+00:00",
       "last_error": null
     }
   }

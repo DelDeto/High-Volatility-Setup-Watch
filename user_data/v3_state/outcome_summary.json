@@ -1,12 +1,12 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-06T03:19:10.119186+00:00",
-  "unique_setups": 43,
-  "ready_unique": 28,
+  "generated_at": "2026-10-06T08:17:31.240052+00:00",
+  "unique_setups": 45,
+  "ready_unique": 29,
   "tracking_counts": {
-    "ACTIVE": 3,
+    "ACTIVE": 4,
     "EXPIRED": 13,
-    "MONITORING": 3,
+    "MONITORING": 4,
     "SL": 20,
     "TP": 4
   },
@@ -21,7 +21,7 @@
   "profit_factor_r": 0.6622548452574598,
   "by_setup": {
     "trend_pullback": {
-      "records": 40,
+      "records": 42,
       "completed": 23,
       "wins_tp": 3,
       "losses_sl": 20,
@@ -41,7 +41,7 @@
   },
   "by_side": {
     "LONG": {
-      "records": 37,
+      "records": 39,
       "completed": 21,
       "wins_tp": 3,
       "losses_sl": 18,
@@ -61,7 +61,7 @@
   },
   "by_volatility": {
     "HIGH": {
-      "records": 16,
+      "records": 17,
       "completed": 9,
       "wins_tp": 1,
       "losses_sl": 8,
@@ -70,7 +70,7 @@
       "profit_factor_r": 0.6083209379547391
     },
     "NORMAL": {
-      "records": 17,
+      "records": 18,
       "completed": 9,
       "wins_tp": 2,
       "losses_sl": 7,
@@ -108,7 +108,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 31,
+      "records": 32,
       "completed": 18,
       "wins_tp": 4,
       "losses_sl": 14,
@@ -135,7 +135,7 @@
       "profit_factor_r": 0.0
     },
     "1.05-1.24x": {
-      "records": 3,
+      "records": 4,
       "completed": 1,
       "wins_tp": 0,
       "losses_sl": 1,
@@ -155,7 +155,7 @@
       "profit_factor_r": null
     },
     "<0.75R": {
-      "records": 28,
+      "records": 30,
       "completed": 15,
       "wins_tp": 3,
       "losses_sl": 12,
@@ -202,7 +202,7 @@
       "profit_factor_r": 0.0
     },
     "85-89": {
-      "records": 16,
+      "records": 17,
       "completed": 11,
       "wins_tp": 2,
       "losses_sl": 9,
@@ -211,7 +211,7 @@
       "profit_factor_r": 0.6125836462166782
     },
     "90-94": {
-      "records": 3,
+      "records": 4,
       "completed": 3,
       "wins_tp": 1,
       "losses_sl": 2,
@@ -231,7 +231,7 @@
   },
   "by_rr": {
     "<2.5R": {
-      "records": 18,
+      "records": 20,
       "completed": 2,
       "wins_tp": 0,
       "losses_sl": 2,
@@ -269,7 +269,7 @@
   },
   "by_entry_distance": {
     "<0.15 ATR": {
-      "records": 9,
+      "records": 10,
       "completed": 3,
       "wins_tp": 0,
       "losses_sl": 3,
@@ -296,7 +296,7 @@
       "profit_factor_r": 1.43263829278059
     },
     "0.35-0.59 ATR": {
-      "records": 11,
+      "records": 12,
       "completed": 7,
       "wins_tp": 1,
       "losses_sl": 6,
