@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-06T10:20:59.532412+00:00",
+  "updated_at": "2026-10-06T15:12:48.750261+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -1716,6 +1716,97 @@
       "created_at": "2026-10-06T10:20:49.105584+00:00",
       "last_attempt_at": "2026-10-06T10:20:54.573280+00:00",
       "sent_at": "2026-10-06T10:20:59.531005+00:00",
+      "last_error": null
+    },
+    "signal:905462562cc92ae1:new": {
+      "key": "signal:905462562cc92ae1:new",
+      "kind": "signal_text",
+      "signal_id": "905462562cc92ae1",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nNIL/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.101490 | SL 0.097400\nTP 0.116690 | RR 3.72R\nScore 85 | Rank #1 | Regime VERY_HIGH\nEntry distance 0.43 ATR | ATR exp 0.69x\nID 905462562cc92ae1",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T15:04:07.382604+00:00",
+      "last_attempt_at": "2026-10-06T15:04:07.384973+00:00",
+      "sent_at": "2026-10-06T15:04:09.034712+00:00",
+      "last_error": null
+    },
+    "signal:905462562cc92ae1:chart:4h": {
+      "key": "signal:905462562cc92ae1:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "905462562cc92ae1",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T15:04:07.382611+00:00",
+      "last_attempt_at": "2026-10-06T15:04:09.034736+00:00",
+      "sent_at": "2026-10-06T15:04:12.683203+00:00",
+      "last_error": null
+    },
+    "signal:905462562cc92ae1:chart:1h": {
+      "key": "signal:905462562cc92ae1:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "905462562cc92ae1",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T15:04:07.382614+00:00",
+      "last_attempt_at": "2026-10-06T15:04:12.683224+00:00",
+      "sent_at": "2026-10-06T15:04:16.502620+00:00",
+      "last_error": null
+    },
+    "signal:a565817a4aed7ba0:ready": {
+      "key": "signal:a565817a4aed7ba0:ready",
+      "kind": "signal_text",
+      "signal_id": "a565817a4aed7ba0",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — PROMOTED TO READY\nYGG/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.028380 | SL 0.027799\nTP 0.030270 | RR 3.25R\nScore 100 | Rank #1 | Regime HIGH\nEntry distance 0.11 ATR | ATR exp 0.78x\nID a565817a4aed7ba0",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T15:11:34.552969+00:00",
+      "last_attempt_at": "2026-10-06T15:11:34.562561+00:00",
+      "sent_at": "2026-10-06T15:11:35.967251+00:00",
+      "last_error": null
+    },
+    "signal:a565817a4aed7ba0:chart:4h": {
+      "key": "signal:a565817a4aed7ba0:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "a565817a4aed7ba0",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T15:11:34.552976+00:00",
+      "last_attempt_at": "2026-10-06T15:11:35.967273+00:00",
+      "sent_at": "2026-10-06T15:11:39.582234+00:00",
+      "last_error": null
+    },
+    "signal:a565817a4aed7ba0:chart:1h": {
+      "key": "signal:a565817a4aed7ba0:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "a565817a4aed7ba0",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T15:11:34.552980+00:00",
+      "last_attempt_at": "2026-10-06T15:11:39.582256+00:00",
+      "sent_at": "2026-10-06T15:11:43.873763+00:00",
+      "last_error": null
+    },
+    "signal:22b978e7d0cebfea:new": {
+      "key": "signal:22b978e7d0cebfea:new",
+      "kind": "signal_text",
+      "signal_id": "22b978e7d0cebfea",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\nVIRTUAL/USDT:USDT · LONG · TREND PULLBACK\nDEVELOPING / WATCHLIST · Rank #1\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 1.81R | Score 75\nID 22b978e7d0cebfea",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-06T15:12:47.195264+00:00",
+      "last_attempt_at": "2026-10-06T15:12:47.198045+00:00",
+      "sent_at": "2026-10-06T15:12:48.749158+00:00",
       "last_error": null
     }
   }
