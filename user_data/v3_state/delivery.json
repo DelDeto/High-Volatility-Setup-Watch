@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-07T19:03:50.043973+00:00",
+  "updated_at": "2026-10-07T19:42:21.387137+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -2366,6 +2366,45 @@
       "created_at": "2026-10-07T19:03:47.622810+00:00",
       "last_attempt_at": "2026-10-07T19:03:48.936571+00:00",
       "sent_at": "2026-10-07T19:03:50.042525+00:00",
+      "last_error": null
+    },
+    "signal:6cea42375640f202:new": {
+      "key": "signal:6cea42375640f202:new",
+      "kind": "signal_text",
+      "signal_id": "6cea42375640f202",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nNMR/USDT:USDT · LONG · BREAKOUT RETEST\nEntry 14.9740 | SL 14.1798\nTP 17.7990 | RR 3.56R\nScore 95 | Rank #1 | Regime VERY_HIGH\nEntry distance 1.72 ATR | ATR exp 0.52x\nID 6cea42375640f202",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T19:41:00.387062+00:00",
+      "last_attempt_at": "2026-10-07T19:41:00.389991+00:00",
+      "sent_at": "2026-10-07T19:41:01.518274+00:00",
+      "last_error": null
+    },
+    "signal:6cea42375640f202:chart:4h": {
+      "key": "signal:6cea42375640f202:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "6cea42375640f202",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T19:41:00.387068+00:00",
+      "last_attempt_at": "2026-10-07T19:41:01.518285+00:00",
+      "sent_at": "2026-10-07T19:41:04.112105+00:00",
+      "last_error": null
+    },
+    "signal:6cea42375640f202:chart:1h": {
+      "key": "signal:6cea42375640f202:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "6cea42375640f202",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T19:41:00.387073+00:00",
+      "last_attempt_at": "2026-10-07T19:41:04.112120+00:00",
+      "sent_at": "2026-10-07T19:41:06.668035+00:00",
       "last_error": null
     }
   }

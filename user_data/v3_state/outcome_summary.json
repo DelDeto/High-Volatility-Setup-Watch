@@ -1,11 +1,12 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-07T19:03:47.622865+00:00",
-  "unique_setups": 62,
-  "ready_unique": 39,
+  "generated_at": "2026-10-07T19:42:21.383674+00:00",
+  "unique_setups": 63,
+  "ready_unique": 40,
   "tracking_counts": {
     "EXPIRED": 23,
     "MONITORING": 1,
+    "PENDING_ENTRY": 1,
     "SL": 33,
     "TP": 5
   },
@@ -29,7 +30,7 @@
       "profit_factor_r": 0.4465075447010579
     },
     "breakout_retest": {
-      "records": 3,
+      "records": 4,
       "completed": 3,
       "wins_tp": 1,
       "losses_sl": 2,
@@ -40,7 +41,7 @@
   },
   "by_side": {
     "LONG": {
-      "records": 52,
+      "records": 53,
       "completed": 33,
       "wins_tp": 3,
       "losses_sl": 30,
@@ -78,7 +79,7 @@
       "profit_factor_r": 0.42409637045770027
     },
     "VERY_HIGH": {
-      "records": 10,
+      "records": 11,
       "completed": 7,
       "wins_tp": 1,
       "losses_sl": 6,
@@ -107,7 +108,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 39,
+      "records": 40,
       "completed": 27,
       "wins_tp": 4,
       "losses_sl": 23,
@@ -181,7 +182,7 @@
       "profit_factor_r": 0.0
     },
     ">=1.50R": {
-      "records": 6,
+      "records": 7,
       "completed": 6,
       "wins_tp": 1,
       "losses_sl": 5,
@@ -219,7 +220,7 @@
       "profit_factor_r": 0.95509219518706
     },
     ">=95": {
-      "records": 9,
+      "records": 10,
       "completed": 9,
       "wins_tp": 2,
       "losses_sl": 7,
@@ -248,7 +249,7 @@
       "profit_factor_r": 0.5984663858222345
     },
     "3.0-3.99R": {
-      "records": 9,
+      "records": 10,
       "completed": 9,
       "wins_tp": 1,
       "losses_sl": 8,
@@ -286,7 +287,7 @@
       "profit_factor_r": 0.39380377256786453
     },
     ">=0.60 ATR": {
-      "records": 7,
+      "records": 8,
       "completed": 5,
       "wins_tp": 1,
       "losses_sl": 4,
