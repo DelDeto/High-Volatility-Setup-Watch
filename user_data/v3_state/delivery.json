@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-07T00:57:34.051730+00:00",
+  "updated_at": "2026-10-07T05:55:25.867330+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -2145,6 +2145,84 @@
       "created_at": "2026-10-07T00:54:56.048837+00:00",
       "last_attempt_at": "2026-10-07T00:54:56.053492+00:00",
       "sent_at": "2026-10-07T00:54:57.333746+00:00",
+      "last_error": null
+    },
+    "outcome:ea3dabdfbdcc6f4a:SL": {
+      "key": "outcome:ea3dabdfbdcc6f4a:SL",
+      "kind": "outcome_text",
+      "signal_id": "ea3dabdfbdcc6f4a",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nBTC/USDT:USDT · LONG · BREAKOUT RETEST\nActual R -1.00R\nMFE +3.20R | MAE -2.28R\nID ea3dabdfbdcc6f4a",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T05:55:17.828354+00:00",
+      "last_attempt_at": "2026-10-07T05:55:17.832127+00:00",
+      "sent_at": "2026-10-07T05:55:19.345500+00:00",
+      "last_error": null
+    },
+    "outcome:b548e7c66675c4b5:SL": {
+      "key": "outcome:b548e7c66675c4b5:SL",
+      "kind": "outcome_text",
+      "signal_id": "b548e7c66675c4b5",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nENJ/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +0.73R | MAE -4.65R\nID b548e7c66675c4b5",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T05:55:17.828376+00:00",
+      "last_attempt_at": "2026-10-07T05:55:19.345520+00:00",
+      "sent_at": "2026-10-07T05:55:20.685225+00:00",
+      "last_error": null
+    },
+    "outcome:644e12acd99f2bb0:SL": {
+      "key": "outcome:644e12acd99f2bb0:SL",
+      "kind": "outcome_text",
+      "signal_id": "644e12acd99f2bb0",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nFLOKI/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +1.25R | MAE -1.58R\nID 644e12acd99f2bb0",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T05:55:17.828391+00:00",
+      "last_attempt_at": "2026-10-07T05:55:20.685247+00:00",
+      "sent_at": "2026-10-07T05:55:22.016845+00:00",
+      "last_error": null
+    },
+    "outcome:73369af468e77283:SL": {
+      "key": "outcome:73369af468e77283:SL",
+      "kind": "outcome_text",
+      "signal_id": "73369af468e77283",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nCHIP/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +2.09R | MAE -1.46R\nID 73369af468e77283",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T05:55:17.828402+00:00",
+      "last_attempt_at": "2026-10-07T05:55:22.016866+00:00",
+      "sent_at": "2026-10-07T05:55:23.358896+00:00",
+      "last_error": null
+    },
+    "outcome:e66b77d5f979c764:SL": {
+      "key": "outcome:e66b77d5f979c764:SL",
+      "kind": "outcome_text",
+      "signal_id": "e66b77d5f979c764",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nFIL/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +0.39R | MAE -1.38R\nID e66b77d5f979c764",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T05:55:17.828411+00:00",
+      "last_attempt_at": "2026-10-07T05:55:23.358914+00:00",
+      "sent_at": "2026-10-07T05:55:24.591655+00:00",
+      "last_error": null
+    },
+    "outcome:756545c7ee20a6ad:SL": {
+      "key": "outcome:756545c7ee20a6ad:SL",
+      "kind": "outcome_text",
+      "signal_id": "756545c7ee20a6ad",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nXMR/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +0.83R | MAE -2.07R\nID 756545c7ee20a6ad",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-07T05:55:17.828420+00:00",
+      "last_attempt_at": "2026-10-07T05:55:24.591675+00:00",
+      "sent_at": "2026-10-07T05:55:25.865479+00:00",
       "last_error": null
     }
   }
