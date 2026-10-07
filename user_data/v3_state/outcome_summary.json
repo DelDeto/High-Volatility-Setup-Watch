@@ -1,12 +1,11 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-07T19:42:21.383674+00:00",
+  "generated_at": "2026-10-07T23:31:44.983103+00:00",
   "unique_setups": 63,
   "ready_unique": 40,
   "tracking_counts": {
-    "EXPIRED": 23,
-    "MONITORING": 1,
-    "PENDING_ENTRY": 1,
+    "ACTIVE": 1,
+    "EXPIRED": 24,
     "SL": 33,
     "TP": 5
   },
@@ -15,7 +14,7 @@
   "sl": 33,
   "timeouts": 0,
   "ambiguous": 0,
-  "expired": 23,
+  "expired": 24,
   "win_rate_tp_sl": 0.13157894736842105,
   "average_r": -0.42876288233436904,
   "profit_factor_r": 0.5062730445846659,
