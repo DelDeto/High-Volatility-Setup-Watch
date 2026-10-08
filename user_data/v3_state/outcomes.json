@@ -1,7 +1,7 @@
 {
   "version": "V3.5",
   "created_at": null,
-  "updated_at": "2026-10-08T21:45:26.525390+00:00",
+  "updated_at": "2026-10-08T22:31:09.774436+00:00",
   "records": [
     {
       "signal_id": "0d71f396d03e05b5",
@@ -3640,8 +3640,8 @@
       "rank_at_ready": 1,
       "plan_valid": true,
       "entry_time": null,
-      "last_checked_at": null,
-      "last_processed_candle_ts": null,
+      "last_checked_at": "2026-10-08T22:31:09.611364+00:00",
+      "last_processed_candle_ts": 1791497700000,
       "mfe_r": null,
       "mae_r": null,
       "closed_at": null,

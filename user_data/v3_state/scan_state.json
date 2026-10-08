@@ -1,8 +1,8 @@
 {
   "version": "V3.4",
-  "last_completed_slot": "2026-10-08T21:30:00+00:00",
-  "last_completed_at": "2026-10-08T21:45:34.794697+00:00",
-  "last_run_id": "37847767056",
-  "last_event": "schedule",
-  "total_catchup_slots": 321
+  "last_completed_slot": "2026-10-08T22:15:00+00:00",
+  "last_completed_at": "2026-10-08T22:31:10.636694+00:00",
+  "last_run_id": "37853458421",
+  "last_event": "workflow_dispatch",
+  "total_catchup_slots": 323
 }
