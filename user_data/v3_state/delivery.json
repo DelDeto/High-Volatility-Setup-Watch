@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-08T02:56:06.836516+00:00",
+  "updated_at": "2026-10-08T03:29:33.066131+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -2457,6 +2457,19 @@
       "created_at": "2026-10-08T02:54:56.448698+00:00",
       "last_attempt_at": "2026-10-08T02:54:56.452657+00:00",
       "sent_at": "2026-10-08T02:54:57.743568+00:00",
+      "last_error": null
+    },
+    "outcome:6cea42375640f202:SL": {
+      "key": "outcome:6cea42375640f202:SL",
+      "kind": "outcome_text",
+      "signal_id": "6cea42375640f202",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nNMR/USDT:USDT · LONG · BREAKOUT RETEST\nActual R -1.00R\nMFE +0.82R | MAE -1.14R\nID 6cea42375640f202",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-08T03:29:31.724551+00:00",
+      "last_attempt_at": "2026-10-08T03:29:31.728667+00:00",
+      "sent_at": "2026-10-08T03:29:33.064068+00:00",
       "last_error": null
     }
   }
