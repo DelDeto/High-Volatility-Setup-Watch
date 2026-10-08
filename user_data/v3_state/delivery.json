@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-08T10:54:54.311341+00:00",
+  "updated_at": "2026-10-08T17:04:57.469669+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -2535,6 +2535,45 @@
       "created_at": "2026-10-08T10:53:44.357849+00:00",
       "last_attempt_at": "2026-10-08T10:53:44.361919+00:00",
       "sent_at": "2026-10-08T10:53:45.741740+00:00",
+      "last_error": null
+    },
+    "signal:280d42084510d239:new": {
+      "key": "signal:280d42084510d239:new",
+      "kind": "signal_text",
+      "signal_id": "280d42084510d239",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\nPI/USDT:USDT · SHORT · TREND PULLBACK\nDEVELOPING / WATCHLIST · Rank #1\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 1.63R | Score 80\nID 280d42084510d239",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-08T16:56:15.074232+00:00",
+      "last_attempt_at": "2026-10-08T16:56:15.078278+00:00",
+      "sent_at": "2026-10-08T16:56:16.405618+00:00",
+      "last_error": null
+    },
+    "signal:55beb34fb5137b39:new": {
+      "key": "signal:55beb34fb5137b39:new",
+      "kind": "signal_text",
+      "signal_id": "55beb34fb5137b39",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\n牛来/USDT:USDT · SHORT · TREND PULLBACK\nDEVELOPING / WATCHLIST · Rank #2\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 1.88R | Score 75\nID 55beb34fb5137b39",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-08T16:56:15.074249+00:00",
+      "last_attempt_at": "2026-10-08T16:56:16.405641+00:00",
+      "sent_at": "2026-10-08T16:56:17.433292+00:00",
+      "last_error": null
+    },
+    "outcome:77cd7bb9a43388f7:SL": {
+      "key": "outcome:77cd7bb9a43388f7:SL",
+      "kind": "outcome_text",
+      "signal_id": "77cd7bb9a43388f7",
+      "timeframe": null,
+      "text": "🛑 FREQTRADE V3.5 — SL\nORCA/USDT:USDT · LONG · TREND PULLBACK\nActual R -1.00R\nMFE +0.07R | MAE -1.23R\nID 77cd7bb9a43388f7",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-08T17:04:56.379037+00:00",
+      "last_attempt_at": "2026-10-08T17:04:56.383226+00:00",
+      "sent_at": "2026-10-08T17:04:57.467854+00:00",
       "last_error": null
     }
   }
