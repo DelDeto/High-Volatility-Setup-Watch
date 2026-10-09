@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-09T09:30:41.522236+00:00",
+  "updated_at": "2026-10-09T15:26:54.533436+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -2639,6 +2639,71 @@
       "created_at": "2026-10-09T09:30:40.493233+00:00",
       "last_attempt_at": "2026-10-09T09:30:40.497719+00:00",
       "sent_at": "2026-10-09T09:30:41.520254+00:00",
+      "last_error": null
+    },
+    "signal:8822b9f4dd0d5c52:new": {
+      "key": "signal:8822b9f4dd0d5c52:new",
+      "kind": "signal_text",
+      "signal_id": "8822b9f4dd0d5c52",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\nBLESS/USDT:USDT · SHORT · BREAKOUT RETEST\nDEVELOPING / WATCHLIST · Rank #2\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 2.30R | Score 88\nID 8822b9f4dd0d5c52",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-09T15:16:36.466777+00:00",
+      "last_attempt_at": "2026-10-09T15:16:36.471134+00:00",
+      "sent_at": "2026-10-09T15:16:37.711298+00:00",
+      "last_error": null
+    },
+    "signal:148ce893d421529b:new": {
+      "key": "signal:148ce893d421529b:new",
+      "kind": "signal_text",
+      "signal_id": "148ce893d421529b",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nDEXE/USDT:USDT · SHORT · TREND PULLBACK\nEntry 1.8090 | SL 1.8375\nTP 1.7170 | RR 3.23R\nScore 95 | Rank #1 | Regime NORMAL\nEntry distance 0.40 ATR | ATR exp 0.97x\nID 148ce893d421529b",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-09T15:18:02.888958+00:00",
+      "last_attempt_at": "2026-10-09T15:18:02.893246+00:00",
+      "sent_at": "2026-10-09T15:18:03.869181+00:00",
+      "last_error": null
+    },
+    "signal:148ce893d421529b:chart:4h": {
+      "key": "signal:148ce893d421529b:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "148ce893d421529b",
+      "timeframe": "4h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-09T15:18:02.888968+00:00",
+      "last_attempt_at": "2026-10-09T15:18:03.869204+00:00",
+      "sent_at": "2026-10-09T15:18:06.603241+00:00",
+      "last_error": null
+    },
+    "signal:148ce893d421529b:chart:1h": {
+      "key": "signal:148ce893d421529b:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "148ce893d421529b",
+      "timeframe": "1h",
+      "text": null,
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-09T15:18:02.888974+00:00",
+      "last_attempt_at": "2026-10-09T15:18:06.603261+00:00",
+      "sent_at": "2026-10-09T15:18:09.091263+00:00",
+      "last_error": null
+    },
+    "signal:88b69cbd95e8e99d:new": {
+      "key": "signal:88b69cbd95e8e99d:new",
+      "kind": "signal_text",
+      "signal_id": "88b69cbd95e8e99d",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\nMARSCOIN/USDT:USDT · SHORT · TREND PULLBACK\nDEVELOPING / WATCHLIST · Rank #1\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 2.02R | Score 78\nID 88b69cbd95e8e99d",
+      "status": "SENT",
+      "attempts": 1,
+      "created_at": "2026-10-09T15:26:53.469794+00:00",
+      "last_attempt_at": "2026-10-09T15:26:53.473933+00:00",
+      "sent_at": "2026-10-09T15:26:54.531461+00:00",
       "last_error": null
     }
   }
