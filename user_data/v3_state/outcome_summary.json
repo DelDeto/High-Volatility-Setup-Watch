@@ -1,12 +1,12 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-09T01:33:40.967495+00:00",
+  "generated_at": "2026-10-09T02:27:03.073561+00:00",
   "unique_setups": 70,
   "ready_unique": 43,
   "tracking_counts": {
+    "ACTIVE": 1,
     "EXPIRED": 26,
     "MONITORING": 2,
-    "PENDING_ENTRY": 1,
     "SL": 36,
     "TP": 5
   },
