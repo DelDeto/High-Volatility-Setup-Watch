@@ -1,12 +1,12 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-10T20:24:07.957273+00:00",
-  "unique_setups": 87,
-  "ready_unique": 52,
+  "generated_at": "2026-10-10T23:53:02.700409+00:00",
+  "unique_setups": 88,
+  "ready_unique": 53,
   "tracking_counts": {
-    "ACTIVE": 4,
-    "EXPIRED": 32,
-    "MONITORING": 4,
+    "ACTIVE": 5,
+    "EXPIRED": 33,
+    "MONITORING": 3,
     "PENDING_ENTRY": 1,
     "SL": 40,
     "TP": 6
@@ -16,13 +16,13 @@
   "sl": 40,
   "timeouts": 0,
   "ambiguous": 0,
-  "expired": 32,
+  "expired": 33,
   "win_rate_tp_sl": 0.13043478260869565,
   "average_r": -0.4469764569667745,
   "profit_factor_r": 0.4859770744882093,
   "by_setup": {
     "trend_pullback": {
-      "records": 82,
+      "records": 83,
       "completed": 42,
       "wins_tp": 5,
       "losses_sl": 37,
@@ -42,7 +42,7 @@
   },
   "by_side": {
     "LONG": {
-      "records": 66,
+      "records": 67,
       "completed": 39,
       "wins_tp": 4,
       "losses_sl": 35,
@@ -80,7 +80,7 @@
       "profit_factor_r": 0.34457830099688147
     },
     "VERY_HIGH": {
-      "records": 15,
+      "records": 16,
       "completed": 8,
       "wins_tp": 1,
       "losses_sl": 7,
@@ -109,7 +109,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 59,
+      "records": 60,
       "completed": 34,
       "wins_tp": 5,
       "losses_sl": 29,
@@ -156,7 +156,7 @@
       "profit_factor_r": null
     },
     "<0.75R": {
-      "records": 64,
+      "records": 65,
       "completed": 31,
       "wins_tp": 5,
       "losses_sl": 26,
@@ -221,7 +221,7 @@
       "profit_factor_r": 0.716319146390295
     },
     ">=95": {
-      "records": 12,
+      "records": 13,
       "completed": 12,
       "wins_tp": 2,
       "losses_sl": 10,
@@ -250,7 +250,7 @@
       "profit_factor_r": 0.7936144221246915
     },
     "3.0-3.99R": {
-      "records": 14,
+      "records": 15,
       "completed": 12,
       "wins_tp": 1,
       "losses_sl": 11,
@@ -270,7 +270,7 @@
   },
   "by_entry_distance": {
     "<0.15 ATR": {
-      "records": 19,
+      "records": 20,
       "completed": 7,
       "wins_tp": 0,
       "losses_sl": 7,
