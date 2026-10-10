@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-10T00:16:22.922326+00:00",
+  "updated_at": "2026-10-10T05:53:36.049973+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -2726,11 +2726,11 @@
       "timeframe": null,
       "text": "🔥 FREQTRADE V3.5 — READY\nRLC/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.954900 | SL 0.802546\nTP 1.4892 | RR 3.51R\nScore 90 | Rank #1 | Regime EXTREME\nEntry distance 0.07 ATR | ATR exp 0.83x\nID d7055685203cc7ce",
       "status": "PENDING",
-      "attempts": 12,
+      "attempts": 21,
       "created_at": "2026-10-09T20:17:15.439808+00:00",
-      "last_attempt_at": "2026-10-10T00:16:13.471293+00:00",
+      "last_attempt_at": "2026-10-10T05:53:16.279326+00:00",
       "sent_at": null,
-      "last_error": "HTTP Error 403: Forbidden"
+      "last_error": "HTTP Error 400: Bad Request"
     },
     "signal:d7055685203cc7ce:chart:4h": {
       "key": "signal:d7055685203cc7ce:chart:4h",
@@ -2739,11 +2739,11 @@
       "timeframe": "4h",
       "text": null,
       "status": "PENDING",
-      "attempts": 12,
+      "attempts": 21,
       "created_at": "2026-10-09T20:17:15.439815+00:00",
-      "last_attempt_at": "2026-10-10T00:16:14.432140+00:00",
+      "last_attempt_at": "2026-10-10T05:53:17.190577+00:00",
       "sent_at": null,
-      "last_error": "HTTP Error 403: Forbidden"
+      "last_error": "HTTP Error 400: Bad Request"
     },
     "signal:d7055685203cc7ce:chart:1h": {
       "key": "signal:d7055685203cc7ce:chart:1h",
@@ -2752,11 +2752,11 @@
       "timeframe": "1h",
       "text": null,
       "status": "PENDING",
-      "attempts": 12,
+      "attempts": 21,
       "created_at": "2026-10-09T20:17:15.439819+00:00",
-      "last_attempt_at": "2026-10-10T00:16:16.023413+00:00",
+      "last_attempt_at": "2026-10-10T05:53:18.718362+00:00",
       "sent_at": null,
-      "last_error": "HTTP Error 403: Forbidden"
+      "last_error": "HTTP Error 400: Bad Request"
     },
     "outcome:148ce893d421529b:SL": {
       "key": "outcome:148ce893d421529b:SL",
@@ -2765,11 +2765,11 @@
       "timeframe": null,
       "text": "🛑 FREQTRADE V3.5 — SL\nDEXE/USDT:USDT · SHORT · TREND PULLBACK\nActual R -1.00R\nMFE +0.53R | MAE -1.02R\nID 148ce893d421529b",
       "status": "PENDING",
-      "attempts": 10,
+      "attempts": 19,
       "created_at": "2026-10-09T20:19:40.688796+00:00",
-      "last_attempt_at": "2026-10-10T00:16:17.625671+00:00",
+      "last_attempt_at": "2026-10-10T05:53:20.216236+00:00",
       "sent_at": null,
-      "last_error": "HTTP Error 403: Forbidden"
+      "last_error": "HTTP Error 400: Bad Request"
     },
     "signal:4bc70c7a39623cc9:new": {
       "key": "signal:4bc70c7a39623cc9:new",
@@ -2778,11 +2778,11 @@
       "timeframe": null,
       "text": "🔥 FREQTRADE V3.5 — READY\nCTSI/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.034100 | SL 0.032680\nTP 0.041250 | RR 5.03R\nScore 100 | Rank #1 | Regime EXTREME\nEntry distance 0.07 ATR | ATR exp 0.43x\nID 4bc70c7a39623cc9",
       "status": "PENDING",
-      "attempts": 7,
+      "attempts": 16,
       "created_at": "2026-10-10T00:08:37.467289+00:00",
-      "last_attempt_at": "2026-10-10T00:16:18.535321+00:00",
+      "last_attempt_at": "2026-10-10T05:53:21.090171+00:00",
       "sent_at": null,
-      "last_error": "HTTP Error 403: Forbidden"
+      "last_error": "HTTP Error 400: Bad Request"
     },
     "signal:4bc70c7a39623cc9:chart:4h": {
       "key": "signal:4bc70c7a39623cc9:chart:4h",
@@ -2791,11 +2791,11 @@
       "timeframe": "4h",
       "text": null,
       "status": "PENDING",
-      "attempts": 7,
+      "attempts": 16,
       "created_at": "2026-10-10T00:08:37.467295+00:00",
-      "last_attempt_at": "2026-10-10T00:16:19.448532+00:00",
+      "last_attempt_at": "2026-10-10T05:53:22.048418+00:00",
       "sent_at": null,
-      "last_error": "HTTP Error 403: Forbidden"
+      "last_error": "HTTP Error 400: Bad Request"
     },
     "signal:4bc70c7a39623cc9:chart:1h": {
       "key": "signal:4bc70c7a39623cc9:chart:1h",
@@ -2804,11 +2804,102 @@
       "timeframe": "1h",
       "text": null,
       "status": "PENDING",
-      "attempts": 7,
+      "attempts": 16,
       "created_at": "2026-10-10T00:08:37.467298+00:00",
-      "last_attempt_at": "2026-10-10T00:16:21.259565+00:00",
+      "last_attempt_at": "2026-10-10T05:53:23.581911+00:00",
       "sent_at": null,
-      "last_error": "HTTP Error 403: Forbidden"
+      "last_error": "HTTP Error 400: Bad Request"
+    },
+    "signal:9e85f3b4f6d8a489:new": {
+      "key": "signal:9e85f3b4f6d8a489:new",
+      "kind": "signal_text",
+      "signal_id": "9e85f3b4f6d8a489",
+      "timeframe": null,
+      "text": "🛰 FREQTRADE V3.5 — DEVELOPING\nLYN/USDT:USDT · SHORT · TREND PULLBACK\nDEVELOPING / WATCHLIST · Rank #1\nWAIT — chưa có execution map cho tới khi READY\nLatest RR 2.12R | Score 93\nID 9e85f3b4f6d8a489",
+      "status": "PENDING",
+      "attempts": 3,
+      "created_at": "2026-10-10T05:50:40.702864+00:00",
+      "last_attempt_at": "2026-10-10T05:53:25.113989+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 400: Bad Request"
+    },
+    "signal:da499db80ac7a5f9:new": {
+      "key": "signal:da499db80ac7a5f9:new",
+      "kind": "signal_text",
+      "signal_id": "da499db80ac7a5f9",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nACE/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.189100 | SL 0.186401\nTP 0.195800 | RR 2.48R\nScore 83 | Rank #1 | Regime NORMAL\nEntry distance 0.31 ATR | ATR exp 0.75x\nID da499db80ac7a5f9",
+      "status": "PENDING",
+      "attempts": 2,
+      "created_at": "2026-10-10T05:51:54.978641+00:00",
+      "last_attempt_at": "2026-10-10T05:53:25.983844+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 400: Bad Request"
+    },
+    "signal:da499db80ac7a5f9:chart:4h": {
+      "key": "signal:da499db80ac7a5f9:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "da499db80ac7a5f9",
+      "timeframe": "4h",
+      "text": null,
+      "status": "PENDING",
+      "attempts": 2,
+      "created_at": "2026-10-10T05:51:54.978650+00:00",
+      "last_attempt_at": "2026-10-10T05:53:26.861501+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 400: Bad Request"
+    },
+    "signal:da499db80ac7a5f9:chart:1h": {
+      "key": "signal:da499db80ac7a5f9:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "da499db80ac7a5f9",
+      "timeframe": "1h",
+      "text": null,
+      "status": "PENDING",
+      "attempts": 2,
+      "created_at": "2026-10-10T05:51:54.978661+00:00",
+      "last_attempt_at": "2026-10-10T05:53:28.372628+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 400: Bad Request"
+    },
+    "signal:9e85f3b4f6d8a489:ready": {
+      "key": "signal:9e85f3b4f6d8a489:ready",
+      "kind": "signal_text",
+      "signal_id": "9e85f3b4f6d8a489",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — PROMOTED TO READY\nLYN/USDT:USDT · SHORT · TREND PULLBACK\nEntry 0.017220 | SL 0.017594\nTP 0.016210 | RR 2.70R\nScore 87 | Rank #1 | Regime HIGH\nEntry distance 0.15 ATR | ATR exp 0.73x\nID 9e85f3b4f6d8a489",
+      "status": "PENDING",
+      "attempts": 1,
+      "created_at": "2026-10-10T05:53:16.274953+00:00",
+      "last_attempt_at": "2026-10-10T05:53:29.940759+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 400: Bad Request"
+    },
+    "signal:9e85f3b4f6d8a489:chart:4h": {
+      "key": "signal:9e85f3b4f6d8a489:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "9e85f3b4f6d8a489",
+      "timeframe": "4h",
+      "text": null,
+      "status": "PENDING",
+      "attempts": 1,
+      "created_at": "2026-10-10T05:53:16.274961+00:00",
+      "last_attempt_at": "2026-10-10T05:53:30.821164+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 400: Bad Request"
+    },
+    "signal:9e85f3b4f6d8a489:chart:1h": {
+      "key": "signal:9e85f3b4f6d8a489:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "9e85f3b4f6d8a489",
+      "timeframe": "1h",
+      "text": null,
+      "status": "PENDING",
+      "attempts": 1,
+      "created_at": "2026-10-10T05:53:16.274967+00:00",
+      "last_attempt_at": "2026-10-10T05:53:33.803171+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 400: Bad Request"
     }
   }
 }
