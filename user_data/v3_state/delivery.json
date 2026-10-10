@@ -1,6 +1,6 @@
 {
   "version": "V3.4",
-  "updated_at": "2026-10-09T20:19:45.611517+00:00",
+  "updated_at": "2026-10-10T00:16:22.922326+00:00",
   "items": {
     "signal:c70c398945f134d6:new": {
       "key": "signal:c70c398945f134d6:new",
@@ -2726,9 +2726,9 @@
       "timeframe": null,
       "text": "🔥 FREQTRADE V3.5 — READY\nRLC/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.954900 | SL 0.802546\nTP 1.4892 | RR 3.51R\nScore 90 | Rank #1 | Regime EXTREME\nEntry distance 0.07 ATR | ATR exp 0.83x\nID d7055685203cc7ce",
       "status": "PENDING",
-      "attempts": 3,
+      "attempts": 12,
       "created_at": "2026-10-09T20:17:15.439808+00:00",
-      "last_attempt_at": "2026-10-09T20:19:40.692800+00:00",
+      "last_attempt_at": "2026-10-10T00:16:13.471293+00:00",
       "sent_at": null,
       "last_error": "HTTP Error 403: Forbidden"
     },
@@ -2739,9 +2739,9 @@
       "timeframe": "4h",
       "text": null,
       "status": "PENDING",
-      "attempts": 3,
+      "attempts": 12,
       "created_at": "2026-10-09T20:17:15.439815+00:00",
-      "last_attempt_at": "2026-10-09T20:19:41.650815+00:00",
+      "last_attempt_at": "2026-10-10T00:16:14.432140+00:00",
       "sent_at": null,
       "last_error": "HTTP Error 403: Forbidden"
     },
@@ -2752,9 +2752,9 @@
       "timeframe": "1h",
       "text": null,
       "status": "PENDING",
-      "attempts": 3,
+      "attempts": 12,
       "created_at": "2026-10-09T20:17:15.439819+00:00",
-      "last_attempt_at": "2026-10-09T20:19:43.183307+00:00",
+      "last_attempt_at": "2026-10-10T00:16:16.023413+00:00",
       "sent_at": null,
       "last_error": "HTTP Error 403: Forbidden"
     },
@@ -2765,9 +2765,48 @@
       "timeframe": null,
       "text": "🛑 FREQTRADE V3.5 — SL\nDEXE/USDT:USDT · SHORT · TREND PULLBACK\nActual R -1.00R\nMFE +0.53R | MAE -1.02R\nID 148ce893d421529b",
       "status": "PENDING",
-      "attempts": 1,
+      "attempts": 10,
       "created_at": "2026-10-09T20:19:40.688796+00:00",
-      "last_attempt_at": "2026-10-09T20:19:44.704730+00:00",
+      "last_attempt_at": "2026-10-10T00:16:17.625671+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 403: Forbidden"
+    },
+    "signal:4bc70c7a39623cc9:new": {
+      "key": "signal:4bc70c7a39623cc9:new",
+      "kind": "signal_text",
+      "signal_id": "4bc70c7a39623cc9",
+      "timeframe": null,
+      "text": "🔥 FREQTRADE V3.5 — READY\nCTSI/USDT:USDT · LONG · TREND PULLBACK\nEntry 0.034100 | SL 0.032680\nTP 0.041250 | RR 5.03R\nScore 100 | Rank #1 | Regime EXTREME\nEntry distance 0.07 ATR | ATR exp 0.43x\nID 4bc70c7a39623cc9",
+      "status": "PENDING",
+      "attempts": 7,
+      "created_at": "2026-10-10T00:08:37.467289+00:00",
+      "last_attempt_at": "2026-10-10T00:16:18.535321+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 403: Forbidden"
+    },
+    "signal:4bc70c7a39623cc9:chart:4h": {
+      "key": "signal:4bc70c7a39623cc9:chart:4h",
+      "kind": "signal_chart",
+      "signal_id": "4bc70c7a39623cc9",
+      "timeframe": "4h",
+      "text": null,
+      "status": "PENDING",
+      "attempts": 7,
+      "created_at": "2026-10-10T00:08:37.467295+00:00",
+      "last_attempt_at": "2026-10-10T00:16:19.448532+00:00",
+      "sent_at": null,
+      "last_error": "HTTP Error 403: Forbidden"
+    },
+    "signal:4bc70c7a39623cc9:chart:1h": {
+      "key": "signal:4bc70c7a39623cc9:chart:1h",
+      "kind": "signal_chart",
+      "signal_id": "4bc70c7a39623cc9",
+      "timeframe": "1h",
+      "text": null,
+      "status": "PENDING",
+      "attempts": 7,
+      "created_at": "2026-10-10T00:08:37.467298+00:00",
+      "last_attempt_at": "2026-10-10T00:16:21.259565+00:00",
       "sent_at": null,
       "last_error": "HTTP Error 403: Forbidden"
     }
