@@ -1,12 +1,13 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-11T19:59:42.674018+00:00",
-  "unique_setups": 97,
-  "ready_unique": 56,
+  "generated_at": "2026-10-11T23:32:05.241527+00:00",
+  "unique_setups": 98,
+  "ready_unique": 57,
   "tracking_counts": {
     "ACTIVE": 3,
-    "EXPIRED": 39,
-    "MONITORING": 3,
+    "EXPIRED": 40,
+    "MONITORING": 2,
+    "PENDING_ENTRY": 1,
     "SL": 43,
     "TP": 9
   },
@@ -15,13 +16,13 @@
   "sl": 43,
   "timeouts": 0,
   "ambiguous": 0,
-  "expired": 39,
+  "expired": 40,
   "win_rate_tp_sl": 0.17307692307692307,
   "average_r": -0.30108557048611,
   "profit_factor_r": 0.635896519412146,
   "by_setup": {
     "trend_pullback": {
-      "records": 90,
+      "records": 91,
       "completed": 48,
       "wins_tp": 8,
       "losses_sl": 40,
@@ -41,7 +42,7 @@
   },
   "by_side": {
     "LONG": {
-      "records": 73,
+      "records": 74,
       "completed": 44,
       "wins_tp": 7,
       "losses_sl": 37,
@@ -61,7 +62,7 @@
   },
   "by_volatility": {
     "HIGH": {
-      "records": 37,
+      "records": 38,
       "completed": 18,
       "wins_tp": 5,
       "losses_sl": 13,
@@ -108,7 +109,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 66,
+      "records": 67,
       "completed": 39,
       "wins_tp": 7,
       "losses_sl": 32,
@@ -155,7 +156,7 @@
       "profit_factor_r": null
     },
     "<0.75R": {
-      "records": 72,
+      "records": 73,
       "completed": 37,
       "wins_tp": 8,
       "losses_sl": 29,
@@ -220,7 +221,7 @@
       "profit_factor_r": 1.3902193243458048
     },
     ">=95": {
-      "records": 14,
+      "records": 15,
       "completed": 13,
       "wins_tp": 2,
       "losses_sl": 11,
@@ -240,7 +241,7 @@
       "profit_factor_r": 0.39023981775220556
     },
     "2.5-2.99R": {
-      "records": 21,
+      "records": 22,
       "completed": 18,
       "wins_tp": 4,
       "losses_sl": 14,
@@ -269,7 +270,7 @@
   },
   "by_entry_distance": {
     "<0.15 ATR": {
-      "records": 22,
+      "records": 23,
       "completed": 12,
       "wins_tp": 2,
       "losses_sl": 10,
