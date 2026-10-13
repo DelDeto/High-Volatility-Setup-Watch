@@ -1,12 +1,12 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-13T08:49:03.968441+00:00",
-  "unique_setups": 106,
-  "ready_unique": 61,
+  "generated_at": "2026-10-13T16:46:33.122002+00:00",
+  "unique_setups": 110,
+  "ready_unique": 64,
   "tracking_counts": {
-    "ACTIVE": 1,
+    "ACTIVE": 4,
     "EXPIRED": 45,
-    "MONITORING": 1,
+    "MONITORING": 2,
     "SL": 49,
     "TP": 10
   },
@@ -21,7 +21,7 @@
   "profit_factor_r": 0.5990062524870989,
   "by_setup": {
     "trend_pullback": {
-      "records": 98,
+      "records": 102,
       "completed": 54,
       "wins_tp": 9,
       "losses_sl": 45,
@@ -41,7 +41,7 @@
   },
   "by_side": {
     "LONG": {
-      "records": 79,
+      "records": 80,
       "completed": 48,
       "wins_tp": 7,
       "losses_sl": 41,
@@ -50,7 +50,7 @@
       "profit_factor_r": 0.515645704814771
     },
     "SHORT": {
-      "records": 27,
+      "records": 30,
       "completed": 11,
       "wins_tp": 3,
       "losses_sl": 8,
@@ -70,7 +70,7 @@
       "profit_factor_r": 0.9839644619402221
     },
     "NORMAL": {
-      "records": 39,
+      "records": 42,
       "completed": 21,
       "wins_tp": 3,
       "losses_sl": 18,
@@ -79,7 +79,7 @@
       "profit_factor_r": 0.4178338251719817
     },
     "VERY_HIGH": {
-      "records": 19,
+      "records": 20,
       "completed": 11,
       "wins_tp": 1,
       "losses_sl": 10,
@@ -108,7 +108,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 72,
+      "records": 73,
       "completed": 44,
       "wins_tp": 8,
       "losses_sl": 36,
@@ -135,7 +135,7 @@
       "profit_factor_r": 1.1539711887149264
     },
     "1.05-1.24x": {
-      "records": 11,
+      "records": 14,
       "completed": 2,
       "wins_tp": 0,
       "losses_sl": 2,
@@ -155,7 +155,7 @@
       "profit_factor_r": null
     },
     "<0.75R": {
-      "records": 77,
+      "records": 79,
       "completed": 42,
       "wins_tp": 9,
       "losses_sl": 33,
@@ -164,7 +164,7 @@
       "profit_factor_r": 0.8026069632214141
     },
     "0.75-0.99R": {
-      "records": 10,
+      "records": 12,
       "completed": 5,
       "wins_tp": 0,
       "losses_sl": 5,
@@ -193,7 +193,7 @@
   },
   "by_score": {
     "<85": {
-      "records": 49,
+      "records": 50,
       "completed": 11,
       "wins_tp": 2,
       "losses_sl": 9,
@@ -202,7 +202,7 @@
       "profit_factor_r": 0.49290933686953625
     },
     "85-89": {
-      "records": 31,
+      "records": 33,
       "completed": 23,
       "wins_tp": 3,
       "losses_sl": 20,
@@ -211,7 +211,7 @@
       "profit_factor_r": 0.41226626620922496
     },
     "90-94": {
-      "records": 11,
+      "records": 12,
       "completed": 10,
       "wins_tp": 3,
       "losses_sl": 7,
@@ -231,7 +231,7 @@
   },
   "by_rr": {
     "<2.5R": {
-      "records": 59,
+      "records": 60,
       "completed": 16,
       "wins_tp": 3,
       "losses_sl": 13,
@@ -240,7 +240,7 @@
       "profit_factor_r": 0.5146641423209257
     },
     "2.5-2.99R": {
-      "records": 23,
+      "records": 25,
       "completed": 21,
       "wins_tp": 4,
       "losses_sl": 17,
@@ -249,7 +249,7 @@
       "profit_factor_r": 0.6535648182203342
     },
     "3.0-3.99R": {
-      "records": 17,
+      "records": 18,
       "completed": 16,
       "wins_tp": 2,
       "losses_sl": 14,
@@ -269,7 +269,7 @@
   },
   "by_entry_distance": {
     "<0.15 ATR": {
-      "records": 26,
+      "records": 28,
       "completed": 14,
       "wins_tp": 3,
       "losses_sl": 11,
@@ -278,7 +278,7 @@
       "profit_factor_r": 0.6803450361508377
     },
     "0.15-0.34 ATR": {
-      "records": 38,
+      "records": 39,
       "completed": 22,
       "wins_tp": 4,
       "losses_sl": 18,
@@ -296,7 +296,7 @@
       "profit_factor_r": 0.40932522650874004
     },
     "0.35-0.59 ATR": {
-      "records": 27,
+      "records": 28,
       "completed": 15,
       "wins_tp": 2,
       "losses_sl": 13,
