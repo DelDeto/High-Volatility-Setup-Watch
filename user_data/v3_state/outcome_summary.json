@@ -1,6 +1,6 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-15T19:32:28.833851+00:00",
+  "generated_at": "2026-10-15T22:39:08.092935+00:00",
   "unique_setups": 119,
   "ready_unique": 69,
   "tracking_counts": {
@@ -108,7 +108,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 81,
+      "records": 82,
       "completed": 49,
       "wins_tp": 11,
       "losses_sl": 38,
@@ -117,7 +117,7 @@
       "profit_factor_r": 0.8306823623634035
     },
     "0.90-1.04x": {
-      "records": 17,
+      "records": 16,
       "completed": 9,
       "wins_tp": 1,
       "losses_sl": 8,
@@ -155,7 +155,7 @@
       "profit_factor_r": null
     },
     "<0.75R": {
-      "records": 86,
+      "records": 87,
       "completed": 48,
       "wins_tp": 13,
       "losses_sl": 35,
@@ -164,7 +164,7 @@
       "profit_factor_r": 1.0655823435748326
     },
     "0.75-0.99R": {
-      "records": 14,
+      "records": 13,
       "completed": 7,
       "wins_tp": 1,
       "losses_sl": 6,
