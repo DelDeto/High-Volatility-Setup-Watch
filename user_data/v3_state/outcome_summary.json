@@ -1,11 +1,11 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-18T07:02:31.514120+00:00",
-  "unique_setups": 130,
-  "ready_unique": 71,
+  "generated_at": "2026-10-18T18:30:13.222598+00:00",
+  "unique_setups": 131,
+  "ready_unique": 72,
   "tracking_counts": {
-    "EXPIRED": 57,
-    "MONITORING": 3,
+    "ACTIVE": 1,
+    "EXPIRED": 60,
     "PENDING_ENTRY": 1,
     "SL": 54,
     "TP": 15
@@ -15,13 +15,13 @@
   "sl": 54,
   "timeouts": 0,
   "ambiguous": 0,
-  "expired": 57,
+  "expired": 60,
   "win_rate_tp_sl": 0.21739130434782608,
   "average_r": -0.1571243949516297,
   "profit_factor_r": 0.7992299397840287,
   "by_setup": {
     "trend_pullback": {
-      "records": 120,
+      "records": 121,
       "completed": 64,
       "wins_tp": 14,
       "losses_sl": 50,
@@ -41,7 +41,7 @@
   },
   "by_side": {
     "LONG": {
-      "records": 88,
+      "records": 89,
       "completed": 51,
       "wins_tp": 7,
       "losses_sl": 44,
@@ -79,7 +79,7 @@
       "profit_factor_r": 0.7721903014917479
     },
     "VERY_HIGH": {
-      "records": 21,
+      "records": 22,
       "completed": 12,
       "wins_tp": 1,
       "losses_sl": 11,
@@ -108,7 +108,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 88,
+      "records": 89,
       "completed": 51,
       "wins_tp": 11,
       "losses_sl": 40,
@@ -182,7 +182,7 @@
       "profit_factor_r": 0.0
     },
     ">=1.50R": {
-      "records": 14,
+      "records": 15,
       "completed": 8,
       "wins_tp": 1,
       "losses_sl": 7,
@@ -220,7 +220,7 @@
       "profit_factor_r": 1.0547098469514522
     },
     ">=95": {
-      "records": 16,
+      "records": 17,
       "completed": 15,
       "wins_tp": 2,
       "losses_sl": 13,
@@ -249,7 +249,7 @@
       "profit_factor_r": 1.153561549007187
     },
     "3.0-3.99R": {
-      "records": 21,
+      "records": 22,
       "completed": 20,
       "wins_tp": 3,
       "losses_sl": 17,
@@ -269,7 +269,7 @@
   },
   "by_entry_distance": {
     "<0.15 ATR": {
-      "records": 34,
+      "records": 35,
       "completed": 18,
       "wins_tp": 5,
       "losses_sl": 13,
