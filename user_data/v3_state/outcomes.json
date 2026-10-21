@@ -1,7 +1,7 @@
 {
   "version": "V3.5",
   "created_at": null,
-  "updated_at": "2026-10-21T12:05:13.788564+00:00",
+  "updated_at": "2026-10-21T16:37:26.524259+00:00",
   "records": [
     {
       "signal_id": "0d71f396d03e05b5",
@@ -6158,7 +6158,7 @@
         "1h": "/freqtrade/user_data/v3_charts/fc17183ef6d59dc0_ESPORTS_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/fc17183ef6d59dc0_ESPORTS_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-21T11:41:24.474552+00:00",
+      "chart_generated_at": "2026-10-21T16:11:25.006838+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -6262,7 +6262,7 @@
         "1h": "/freqtrade/user_data/v3_charts/ab09a70c3eb29da6_APT_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/ab09a70c3eb29da6_APT_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-21T11:41:32.047230+00:00",
+      "chart_generated_at": "2026-10-21T16:11:33.015169+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -6766,7 +6766,7 @@
         "1h": "/freqtrade/user_data/v3_charts/aedeb793ff2dc839_SIREN_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/aedeb793ff2dc839_SIREN_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-21T11:41:49.877736+00:00",
+      "chart_generated_at": "2026-10-21T16:11:55.381776+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -6820,7 +6820,7 @@
         "1h": "/freqtrade/user_data/v3_charts/45ead51edbe6f4ac_ALT_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/45ead51edbe6f4ac_ALT_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-21T11:41:56.538005+00:00",
+      "chart_generated_at": "2026-10-21T16:12:06.276080+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7074,7 +7074,7 @@
         "1h": "/freqtrade/user_data/v3_charts/3f5319c2c6f039f2_PHA_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/3f5319c2c6f039f2_PHA_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-21T11:42:09.091963+00:00",
+      "chart_generated_at": "2026-10-21T16:12:22.563024+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7128,7 +7128,7 @@
         "1h": "/freqtrade/user_data/v3_charts/8b28b4d72e77bf78_ALT_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/8b28b4d72e77bf78_ALT_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-21T11:42:14.709739+00:00",
+      "chart_generated_at": "2026-10-21T16:12:30.906147+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7165,6 +7165,56 @@
       "obstacle_clearance_r": null,
       "quality_gates": "PASS",
       "opportunity_value": 91.84470137061271,
+      "rank_at_ready": null,
+      "plan_valid": null,
+      "entry_time": null,
+      "last_checked_at": null,
+      "last_processed_candle_ts": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "closed_at": null,
+      "expired_at": null,
+      "outcome": null,
+      "actual_r": null,
+      "exit_price": null,
+      "hold_hours": null,
+      "charts": {},
+      "chart_generated_at": null,
+      "notes": []
+    },
+    {
+      "signal_id": "69140cf7a106b609",
+      "symbol": "INJ/USDT:USDT",
+      "side": "LONG",
+      "setup": "trend_pullback",
+      "created_at": "2026-10-21T15:00:00+00:00",
+      "first_seen_at": "2026-10-21T15:00:00+00:00",
+      "last_seen_at": "2026-10-21T15:00:00+00:00",
+      "scanner_status": "DEVELOPING",
+      "tracking_status": "MONITORING",
+      "initial_rank": 1,
+      "latest_rank": 1,
+      "latest_score": 83,
+      "latest_rr": 2.069881810228001,
+      "latest_opportunity_value": 90.04680682720024,
+      "latest_atr_expansion": 0.7055219559331918,
+      "latest_obstacle_clearance_r": 0.3888868855579842,
+      "ready_at": null,
+      "entry": null,
+      "stop": null,
+      "target": null,
+      "risk": null,
+      "rr": null,
+      "score": null,
+      "required_score": null,
+      "required_rr": null,
+      "volatility_regime": "HIGH",
+      "range_24h_pct": 11.195176734838652,
+      "entry_distance_atr": 0.24654408274235212,
+      "atr_expansion": null,
+      "obstacle_clearance_r": null,
+      "quality_gates": "PASS",
+      "opportunity_value": 90.04680682720024,
       "rank_at_ready": null,
       "plan_valid": null,
       "entry_time": null,
