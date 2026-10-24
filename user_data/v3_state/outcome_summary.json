@@ -1,10 +1,10 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-24T07:40:23.859798+00:00",
-  "unique_setups": 147,
+  "generated_at": "2026-10-24T16:20:22.959111+00:00",
+  "unique_setups": 148,
   "ready_unique": 79,
   "tracking_counts": {
-    "EXPIRED": 68,
+    "EXPIRED": 69,
     "MONITORING": 1,
     "SL": 61,
     "TP": 17
@@ -14,13 +14,13 @@
   "sl": 61,
   "timeouts": 0,
   "ambiguous": 0,
-  "expired": 68,
+  "expired": 69,
   "win_rate_tp_sl": 0.21794871794871795,
   "average_r": -0.1478886689042588,
   "profit_factor_r": 0.8108964561552101,
   "by_setup": {
     "trend_pullback": {
-      "records": 136,
+      "records": 137,
       "completed": 73,
       "wins_tp": 16,
       "losses_sl": 57,
@@ -49,7 +49,7 @@
       "profit_factor_r": 0.490464178957602
     },
     "SHORT": {
-      "records": 48,
+      "records": 49,
       "completed": 19,
       "wins_tp": 9,
       "losses_sl": 10,
@@ -78,7 +78,7 @@
       "profit_factor_r": 0.8938936938766566
     },
     "VERY_HIGH": {
-      "records": 27,
+      "records": 28,
       "completed": 16,
       "wins_tp": 2,
       "losses_sl": 14,
@@ -116,7 +116,7 @@
       "profit_factor_r": 0.7703941086791614
     },
     "0.90-1.04x": {
-      "records": 23,
+      "records": 24,
       "completed": 11,
       "wins_tp": 2,
       "losses_sl": 9,
@@ -154,7 +154,7 @@
       "profit_factor_r": null
     },
     "<0.75R": {
-      "records": 108,
+      "records": 109,
       "completed": 55,
       "wins_tp": 13,
       "losses_sl": 42,
@@ -210,7 +210,7 @@
       "profit_factor_r": 0.6724499484867491
     },
     "90-94": {
-      "records": 18,
+      "records": 19,
       "completed": 17,
       "wins_tp": 5,
       "losses_sl": 12,
@@ -230,7 +230,7 @@
   },
   "by_rr": {
     "<2.5R": {
-      "records": 86,
+      "records": 87,
       "completed": 20,
       "wins_tp": 5,
       "losses_sl": 15,
@@ -268,7 +268,7 @@
   },
   "by_entry_distance": {
     "<0.15 ATR": {
-      "records": 42,
+      "records": 43,
       "completed": 24,
       "wins_tp": 7,
       "losses_sl": 17,
