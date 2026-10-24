@@ -1,6 +1,6 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-10-24T16:20:22.959111+00:00",
+  "generated_at": "2026-10-24T18:55:25.047692+00:00",
   "unique_setups": 148,
   "ready_unique": 79,
   "tracking_counts": {
@@ -192,7 +192,7 @@
   },
   "by_score": {
     "<85": {
-      "records": 73,
+      "records": 74,
       "completed": 15,
       "wins_tp": 4,
       "losses_sl": 11,
@@ -210,7 +210,7 @@
       "profit_factor_r": 0.6724499484867491
     },
     "90-94": {
-      "records": 19,
+      "records": 18,
       "completed": 17,
       "wins_tp": 5,
       "losses_sl": 12,

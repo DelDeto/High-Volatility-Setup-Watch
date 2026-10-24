@@ -1,7 +1,7 @@
 {
   "version": "V3.5",
   "created_at": null,
-  "updated_at": "2026-10-24T16:20:22.959004+00:00",
+  "updated_at": "2026-10-24T18:55:25.047598+00:00",
   "records": [
     {
       "signal_id": "0d71f396d03e05b5",
@@ -6766,7 +6766,7 @@
         "1h": "/freqtrade/user_data/v3_charts/aedeb793ff2dc839_SIREN_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/aedeb793ff2dc839_SIREN_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:53:08.016389+00:00",
+      "chart_generated_at": "2026-10-24T18:26:44.496220+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -6820,7 +6820,7 @@
         "1h": "/freqtrade/user_data/v3_charts/45ead51edbe6f4ac_ALT_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/45ead51edbe6f4ac_ALT_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:53:14.648845+00:00",
+      "chart_generated_at": "2026-10-24T18:26:51.925023+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7074,7 +7074,7 @@
         "1h": "/freqtrade/user_data/v3_charts/3f5319c2c6f039f2_PHA_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/3f5319c2c6f039f2_PHA_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:53:27.005536+00:00",
+      "chart_generated_at": "2026-10-24T18:27:06.124134+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7128,7 +7128,7 @@
         "1h": "/freqtrade/user_data/v3_charts/8b28b4d72e77bf78_ALT_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/8b28b4d72e77bf78_ALT_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:53:33.916172+00:00",
+      "chart_generated_at": "2026-10-24T18:27:13.711555+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7232,7 +7232,7 @@
         "1h": "/freqtrade/user_data/v3_charts/69140cf7a106b609_INJ_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/69140cf7a106b609_INJ_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:53:43.728805+00:00",
+      "chart_generated_at": "2026-10-24T18:27:25.698224+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7436,7 +7436,7 @@
         "1h": "/freqtrade/user_data/v3_charts/45b582f3d483bfc1_CVX_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/45b582f3d483bfc1_CVX_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:53:54.172053+00:00",
+      "chart_generated_at": "2026-10-24T18:27:37.182701+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7490,7 +7490,7 @@
         "1h": "/freqtrade/user_data/v3_charts/e2d2773174cbc67f_DYM_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/e2d2773174cbc67f_DYM_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:53:59.867156+00:00",
+      "chart_generated_at": "2026-10-24T18:27:43.527688+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7544,7 +7544,7 @@
         "1h": "/freqtrade/user_data/v3_charts/1d2cb1a74742790c_HBAR_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/1d2cb1a74742790c_HBAR_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:54:06.760137+00:00",
+      "chart_generated_at": "2026-10-24T18:27:51.525355+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7598,7 +7598,7 @@
         "1h": "/freqtrade/user_data/v3_charts/e12023312bd5cbbd_ARKM_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/e12023312bd5cbbd_ARKM_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-10-24T15:54:12.594611+00:00",
+      "chart_generated_at": "2026-10-24T18:27:57.871965+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
@@ -7659,16 +7659,16 @@
       "setup": "trend_pullback",
       "created_at": "2026-10-24T15:15:00+00:00",
       "first_seen_at": "2026-10-24T15:15:00+00:00",
-      "last_seen_at": "2026-10-24T15:15:00+00:00",
+      "last_seen_at": "2026-10-24T17:15:00+00:00",
       "scanner_status": "DEVELOPING",
       "tracking_status": "MONITORING",
       "initial_rank": 1,
       "latest_rank": 1,
-      "latest_score": 93,
-      "latest_rr": 2.021036251237636,
-      "latest_opportunity_value": 100.83320872713882,
-      "latest_atr_expansion": 0.9171245551685957,
-      "latest_obstacle_clearance_r": 0.14663669961661138,
+      "latest_score": 83,
+      "latest_rr": 2.099413907781021,
+      "latest_opportunity_value": 91.0069236446956,
+      "latest_atr_expansion": 0.9659201415407849,
+      "latest_obstacle_clearance_r": 0.44268791665670143,
       "ready_at": null,
       "entry": null,
       "stop": null,
