@@ -1,7 +1,7 @@
 {
   "version": "V3.5",
   "created_at": null,
-  "updated_at": "2026-11-01T21:06:50.551115+00:00",
+  "updated_at": "2026-11-02T00:22:01.307105+00:00",
   "records": [
     {
       "signal_id": "0d71f396d03e05b5",
@@ -8060,7 +8060,7 @@
         "1h": "/freqtrade/user_data/v3_charts/b45dd26d15274818_WLFI_USDT_USDT/1h.png",
         "4h": "/freqtrade/user_data/v3_charts/b45dd26d15274818_WLFI_USDT_USDT/4h.png"
       },
-      "chart_generated_at": "2026-11-01T20:39:28.067643+00:00",
+      "chart_generated_at": "2026-11-01T23:55:25.923211+00:00",
       "notes": [],
       "chart_style_version": "market-scan-v1"
     },
