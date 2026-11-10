@@ -1,12 +1,13 @@
 {
   "version": "V3.5",
-  "generated_at": "2026-11-09T02:34:36.168943+00:00",
-  "unique_setups": 167,
-  "ready_unique": 86,
+  "generated_at": "2026-11-10T03:18:27.971918+00:00",
+  "unique_setups": 175,
+  "ready_unique": 89,
   "tracking_counts": {
-    "ACTIVE": 1,
-    "EXPIRED": 82,
-    "MONITORING": 1,
+    "ACTIVE": 3,
+    "EXPIRED": 83,
+    "MONITORING": 5,
+    "PENDING_ENTRY": 1,
     "SL": 65,
     "TP": 18
   },
@@ -15,13 +16,13 @@
   "sl": 65,
   "timeouts": 0,
   "ambiguous": 0,
-  "expired": 82,
+  "expired": 83,
   "win_rate_tp_sl": 0.21686746987951808,
   "average_r": -0.161500623596933,
   "profit_factor_r": 0.7937761267916087,
   "by_setup": {
     "trend_pullback": {
-      "records": 153,
+      "records": 161,
       "completed": 77,
       "wins_tp": 16,
       "losses_sl": 61,
@@ -50,7 +51,7 @@
       "profit_factor_r": 0.4719560967327868
     },
     "SHORT": {
-      "records": 60,
+      "records": 68,
       "completed": 22,
       "wins_tp": 10,
       "losses_sl": 12,
@@ -70,7 +71,7 @@
       "profit_factor_r": 1.0298925995606654
     },
     "NORMAL": {
-      "records": 65,
+      "records": 73,
       "completed": 30,
       "wins_tp": 8,
       "losses_sl": 22,
@@ -108,7 +109,7 @@
       "profit_factor_r": null
     },
     "<0.90x": {
-      "records": 103,
+      "records": 111,
       "completed": 59,
       "wins_tp": 12,
       "losses_sl": 47,
@@ -155,7 +156,7 @@
       "profit_factor_r": null
     },
     "<0.75R": {
-      "records": 117,
+      "records": 125,
       "completed": 57,
       "wins_tp": 13,
       "losses_sl": 44,
@@ -193,7 +194,7 @@
   },
   "by_score": {
     "<85": {
-      "records": 84,
+      "records": 90,
       "completed": 17,
       "wins_tp": 4,
       "losses_sl": 13,
@@ -211,7 +212,7 @@
       "profit_factor_r": 0.7739149206765942
     },
     "90-94": {
-      "records": 21,
+      "records": 23,
       "completed": 19,
       "wins_tp": 5,
       "losses_sl": 14,
@@ -231,7 +232,7 @@
   },
   "by_rr": {
     "<2.5R": {
-      "records": 102,
+      "records": 108,
       "completed": 23,
       "wins_tp": 6,
       "losses_sl": 17,
@@ -249,7 +250,7 @@
       "profit_factor_r": 1.0894747962845654
     },
     "3.0-3.99R": {
-      "records": 25,
+      "records": 27,
       "completed": 25,
       "wins_tp": 4,
       "losses_sl": 21,
@@ -278,7 +279,7 @@
       "profit_factor_r": 0.9357550756935765
     },
     "0.15-0.34 ATR": {
-      "records": 61,
+      "records": 67,
       "completed": 30,
       "wins_tp": 6,
       "losses_sl": 24,
@@ -296,7 +297,7 @@
       "profit_factor_r": 0.7137201430782756
     },
     "0.35-0.59 ATR": {
-      "records": 36,
+      "records": 38,
       "completed": 17,
       "wins_tp": 3,
       "losses_sl": 14,
